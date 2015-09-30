@@ -17,5 +17,8 @@ export default Ember.Service.extend({
       }
       return JSON.parse(localStorage.authToken);
     }
+  },
+  set: function(property, value) {
+    localStorage[property] = value;
   }
 });
