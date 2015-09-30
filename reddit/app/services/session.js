@@ -12,6 +12,9 @@ export default Ember.Service.extend({
       return localStorage.authState;
     },
     token: function() {
+      if(!localStorage.authToken) {
+        return false;
+      }
       return JSON.parse(localStorage.authToken);
     }
   }
