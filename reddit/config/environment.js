@@ -2,6 +2,9 @@
 
 module.exports = function(environment) {
   var ENV = {
+    contentSecurityPolicy: {
+      'connect-src': "'self' https://*.reddit.com"
+    },
     modulePrefix: 'reddit',
     environment: environment,
     baseURL: '/',

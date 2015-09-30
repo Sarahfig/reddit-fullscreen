@@ -7,8 +7,8 @@ export function initialize(container, application) {
   application.inject('route', 'api', 'service:api');
 
   //inject into services
-  application.inject('service:api', 'session', 'service:session');
-  application.inject('service:ajax', 'session', 'service:api');
+  //application.inject('service:api', 'session', 'service:session');
+  //application.inject('service:api', 'ajax', 'util:ajax');
 }
 
 export default {
