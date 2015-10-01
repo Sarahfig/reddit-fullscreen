@@ -2,20 +2,20 @@ import Ember from 'ember';
 
 export default Ember.Service.extend({
   auth: {
-    error: function(){
-      return localStorage.authError;
-    },
-    code: function() {
-      return localStorage.authCode;
+    expires: function() {
+      return localStorage.authExpires;
     },
     state: function() {
       return localStorage.authState;
     },
     token: function() {
-      if(!localStorage.authToken) {
-        return false;
+      return localStorage.authToken;
+    },
+    needed: function() {
+      if(!this.token() || this.expires() < new Date().getTime()) {
+        return true;
       }
-      return JSON.parse(localStorage.authToken);
+      return false;
     }
   },
   set: function(property, value) {

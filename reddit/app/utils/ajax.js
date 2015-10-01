@@ -7,8 +7,8 @@ export default function ajax() {
         Ember.$.ajax({
           type:'POST',
           url: url,
-          data: data,
           headers: other.headers ? other.headers : {},
+          data: data,
           success: function(response) {
             console.log('returned', response);
             resolve(response);
