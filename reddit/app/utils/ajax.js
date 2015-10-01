@@ -10,7 +10,6 @@ export default function ajax() {
           headers: other.headers ? other.headers : {},
           data: data,
           success: function(response) {
-            console.log('returned', response);
             resolve(response);
           },
           error: function(response) {
@@ -27,7 +26,6 @@ export default function ajax() {
           headers: other.headers ? other.headers : {},
           data: data,
           success: function(response) {
-            console.log('returned', response);
             resolve(response);
           },
           error: function(response) {

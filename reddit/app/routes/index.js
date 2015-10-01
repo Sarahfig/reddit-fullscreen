@@ -21,9 +21,9 @@ export default Ember.Route.extend({
             id: data.id,
             isSelf: data.is_self,
             media: data.media,
-            embed: data.embed,
+            embed: data.media_embed,
             name: data.name,
-            numComments: data.numComments,
+            numComments: data.num_comments,
             nsfw: data.over_18,
             saved: data.saved,
             score: data.score,
@@ -34,8 +34,28 @@ export default Ember.Route.extend({
             ups: data.ups,
             url: data.url,
           };
+		if(!parsed.media) {
+			if(parsed.url.toLowerCase().match(/\.(jpg|png|gif)/g)) {
+				parsed.type = 'image';
+			} else if(parsed.url.indexOf('//imgur.com/') !== -1) {
+				parsed.type = 'image';
+				parsed.url = parsed.url + '.jpg';
+			} else {
+				parsed.type = 'article';
+			}
+		} else {
+			if(parsed.media.oembed.type === 'video') {
+				parsed.type = 'video';
+				parsed.html = parsed.media.oembed.html;
+			} else if(parsed.url.indexOf('//imgur.com/a/')){
+				parsed.type = 'album';
+			} else {
+				console.log('unsupported media type', parsed);
+			}
+		}
         return parsed;
       });
+	  console.log(model.list);
       return model;
     });
   }
