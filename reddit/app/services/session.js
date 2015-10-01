@@ -20,7 +20,7 @@ export default Ember.Service.extend({
   },
   account: {
     user: function() {
-      if(!localStorage.user) {
+      if(!localStorage.accountUser) {
         return null;
       }
       return JSON.parse(localStorage.accountUser);
