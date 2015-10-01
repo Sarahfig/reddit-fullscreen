@@ -1,20 +1,19 @@
 import Ember from 'ember';
 import Ajax from 'reddit/utils/ajax';
 
+var base = 'https://oauth.reddit.com/api/',
+  token = function() {
+    return 'Bearer ' + localStorage.authToken;
+  };
+
 export default Ember.Service.extend({
-  auth: {
-    getToken:function(code) {
-      var data = {
-        grant_type: 'authorization_code',
-        code: code,
-        redirect_uri: 'http://localhost:4200/authorize'
-      };
-      return new Ajax().post('https://ssl.reddit.com/api/v1/access_token', data, {
+  account: {
+    getMe: function() {
+      return new Ajax().get(base + 'v1/me', null, {
         headers: {
-          'Authorization': 'Basic ZWE3iZH2TyAp8g:ZFvRllL6c8qm0hcgfRxlIKSLkTo'
+          'Authorization': token()
         }
       });
-    },
-    refresh:null
+    }
   }
 });

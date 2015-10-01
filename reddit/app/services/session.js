@@ -18,7 +18,19 @@ export default Ember.Service.extend({
       return false;
     }
   },
+  account: {
+    user: function() {
+      if(!localStorage.user) {
+        return null;
+      }
+      return JSON.parse(localStorage.accountUser);
+    }
+  },
   set: function(property, value) {
-    localStorage[property] = value;
+    if(typeof value === 'object') {
+      localStorage[property] = JSON.stringify(value);
+    } else {
+      localStorage[property] = value;
+    }
   }
 });

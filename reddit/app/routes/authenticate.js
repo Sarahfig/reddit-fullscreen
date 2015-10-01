@@ -2,13 +2,17 @@ import Ember from 'ember';
 
 export default Ember.Route.extend({
   beforeModel: function() {
-    var fn = this.functions;
-    var token = fn.getToken(this);
+    var self = this;
+    var fn = self.functions;
+    var token = fn.getToken(self);
     console.log('got token:', token);
     if(!token) {
       return;
     }
-    this.transitionTo('index');
+    self.api.account.getMe().then(function(response) {
+      self.session.set('accountUser', response);
+      self.transitionTo('index');
+    });
   },
 
   functions: {
