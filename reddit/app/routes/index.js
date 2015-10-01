@@ -36,19 +36,25 @@ export default Ember.Route.extend({
           };
 		if(!parsed.media) {
 			if(parsed.url.toLowerCase().match(/\.(jpg|png|gif)/g)) {
-				parsed.type = 'image';
+				parsed.isImage = true;
 			} else if(parsed.url.indexOf('//imgur.com/') !== -1) {
-				parsed.type = 'image';
+				parsed.isImage = true;
 				parsed.url = parsed.url + '.jpg';
 			} else {
-				parsed.type = 'article';
+				console.log('article', parsed);
+				parsed.isArticle = true;
+				if(parsed.thumbnail === 'self' || !parsed.thumbnail) {
+					parsed.isArticleNoThumbnail = true;
+				} else {
+					parsed.isArticleThumbnail = true;
+				}
 			}
 		} else {
 			if(parsed.media.oembed.type === 'video') {
-				parsed.type = 'video';
-				parsed.html = parsed.media.oembed.html;
+				parsed.isVideo = true;
+				parsed.html = Ember.$('<div/>').html(parsed.media.oembed.html).text();
 			} else if(parsed.url.indexOf('//imgur.com/a/')){
-				parsed.type = 'album';
+				parsed.isAlbum = true;
 			} else {
 				console.log('unsupported media type', parsed);
 			}
