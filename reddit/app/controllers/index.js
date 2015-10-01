@@ -10,7 +10,6 @@ export default Ember.Controller.extend({
   },
   list: function() {
 	  var list = this.get('model.list');
-	  console.log(list);
 	  var displayed = [];
 	  if(list[this.previousIndex()]) {
 		  displayed.push(list[this.previousIndex()]);
