@@ -41,7 +41,6 @@ export default Ember.Route.extend({
 				parsed.isImage = true;
 				parsed.url = parsed.url + '.jpg';
 			} else {
-				console.log('article', parsed);
 				parsed.isArticle = true;
 				if(parsed.thumbnail === 'self' || !parsed.thumbnail) {
 					parsed.isArticleNoThumbnail = true;
@@ -61,7 +60,6 @@ export default Ember.Route.extend({
 		}
         return parsed;
       });
-	  console.log(model.list);
       return model;
     });
   }

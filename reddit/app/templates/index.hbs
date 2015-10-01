@@ -1,6 +1,6 @@
 <ul>
 	{{#each post in model.list}}
-		<li>
+		<li class="{{isCurrent}}">
 			<div class="display">
 				{{#if post.isImage}}
 					<img src="{{post.url}}" />
