@@ -1,6 +1,6 @@
 <ul>
-	{{#each post in model.list}}
-		<li class="{{isCurrent}}">
+	{{#each post in list}}
+		<li {{bind-attr class="post.isCurrent:current post.isPrevious:previous post.isNext:next"}}>
 			<div class="display">
 				{{#if post.isImage}}
 					<img src="{{post.url}}" />

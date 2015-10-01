@@ -10,9 +10,16 @@ export default Ember.Controller.extend({
   },
   list: function() {
 	  var list = this.get('model.list');
-	  list[this.previousIndex()].isPrevious = true;
-	  list[this.currentIndex].isCurrent = true;
-	  list[this.nextIndex()].isNext = true;
-	  return list;
+	  console.log(list);
+	  var displayed = [];
+	  if(list[this.previousIndex()]) {
+		  displayed.push(list[this.previousIndex()]);
+		  displayed[0].isPrevious = true;
+	  }
+	  displayed.push(list[this.currentIndex]);
+	  displayed[displayed.length - 1].isCurrent = true;
+	  displayed.push(list[this.nextIndex()]);
+	  displayed[displayed.length - 1].isNext = true;
+	  return displayed;
   }.property('model.list')
 });
