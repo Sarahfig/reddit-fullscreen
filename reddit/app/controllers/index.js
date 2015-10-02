@@ -30,33 +30,45 @@ export default Ember.Controller.extend({
 			  this.set('currentIndex', this.currentIndex - 1);
 		  }
 	  },
-	  upVote: function(post) {
+	  upVote: function() {
+		  var list = this.get('model.list');
+		  var current = this.get('currentIndex');
+		  var post = null;
+		  list.forEach(function(item, index) {
+			  if(index === current) {
+				  post = item;
+			  }
+		  });
 		  if(post.isUpVoted) {
-			  this.api.post.removeVote(post.id).then(function(response) {
-				  console.log('response', response);
+			  this.api.post.removeVote(post.name).then(function() {
 				  post.isUpVoted = false;
 			  });
 		  } else {
-			  this.api.post.upVote(post.id).then(function(response) {
-				  console.log('response', response);
+			  this.api.post.upVote(post.name).then(function() {
 				  post.isUpVoted = true;
 			  });
 		  }
 		  post.isDownVoted = false;
-		  console.log('send upvote', post);
 	  },
-	  downVote: function(post) {
+	  downVote: function() {
+		 var list = this.get('model.list');
+		 var current = this.get('currentIndex');
+		 var post = null;
+		 list.forEach(function(item, index) {
+			 if(index === current) {
+				 post = item;
+			 }
+		 });
 		  if(post.isDownVoted) {
-			  this.api.post.removeVote(post.id).then(function() {
+			  this.api.post.removeVote(post.name).then(function() {
 				  post.isDownVoted = false;
 			  });
 		  } else {
-			  this.api.post.upVote(post.id).then(function() {
+			  this.api.post.upVote(post.name).then(function() {
 				  post.isDownVoted = true;
 			  });
 		  }
-		  post.isUpVoted = false;
-		  console.log('send downvote', post);
+		 post.isUpVoted = false;
 	  }
   }
 });
