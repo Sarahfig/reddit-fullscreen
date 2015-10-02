@@ -1,0 +1,23 @@
+{{#each post in list}}
+	<li {{bind-attr class="post.isCurrent:current post.isPrevious:previous post.isNext:next"}}>
+		<div class="display">
+			{{#if post.isImage}}
+				<img src="{{post.url}}" />
+			{{/if}}
+			{{#if post.isVideo}}
+				{{{post.html}}}
+			{{/if}}
+			{{#if post.isArticleThumbnail}}
+				<img src="{{post.thumbnail}}" />
+			{{/if}}
+			{{#if post.isArticleNoThumbnail}}
+				<div>no image</div>
+			{{/if}}
+		</div>
+		<div class="info">
+			<a href="{{post.url}}" class="title" target="_blank">{{post.title}}</a>
+		</div>
+	</li>
+{{/each}}
+
+{{yield}}

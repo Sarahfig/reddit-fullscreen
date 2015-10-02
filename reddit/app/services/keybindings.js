@@ -1,232 +1,91 @@
 import Ember from 'ember';
-
+var KeyFunction = function(data) {
+	Ember.$.extend(this, data);
+	this.user = function() {
+		return localStorage[data.name] ? localStorage[data.name] : 'default';
+	};
+	return this;
+};
+KeyFunction.prototype.getKey = function() {
+	if(this.user() === 'default') {
+		return this.default;
+	}
+	return this.user();
+};
 export default Ember.Service.extend({
 	functions: {
-		nextPost: {
-			default: 'Right Arrow',
+		nextPost: new KeyFunction({
+			default: 'D',
 			description: 'Move to next post',
-			user: localStorage.keyNextPost ? localStorage.keyNextPost : 'default'
-		},
-		previousPost: {
-			default: 'Left Arrow',
+			name: 'keyNextPost'
+		}),
+		previousPost: new KeyFunction({
+			default: 'A',
 			description: 'Move to previous post',
-			user: localStorage.keyPreviousPost ? localStorage.keyPreviousPost : 'default'
-		},
-		upVote: {
-			default: 'Up Arrow',
+			name: 'keyPreviousPost'
+		}),
+		upVote: new KeyFunction({
+			default: 'W',
 			description: 'Upvote currently viewed post',
-			user: localStorage.keyUpVote ? localStorage.keyUpVote : 'default'
-		},
-		downVote: {
-			default: 'Down Arrow',
+			name: 'keyUpvote'
+		}),
+		downVote: new KeyFunction({
+			default: 'S',
 			description: 'Downvote currently viewed post',
-			user: localStorage.keyDownVote ? localStorage.keyDownVote : 'default'
-		}
+			name: 'keyDownVote'
+		})
 	},
-	keyMap: [
-		{
-			name: 'A',
-			value: 97
-		},
-		{
-			name: 'B',
-			value: 98
-		},
-		{
-			name: 'C',
-			value: 99
-		},
-		{
-			name: 'D',
-			value: 100
-		},
-		{
-			name: 'E',
-			value: 101
-		},
-		{
-			name: 'F',
-			value: 102
-		},
-		{
-			name: 'G',
-			value: 103
-		},
-		{
-			name: 'H',
-			value: 104
-		},
-		{
-			name: 'I',
-			value: 105
-		},
-		{
-			name: 'J',
-			value: 106
-		},
-		{
-			name: 'K',
-			value: 107
-		},
-		{
-			name: 'L',
-			value: 108
-		},
-		{
-			name: 'M',
-			value: 109
-		},
-		{
-			name: 'N',
-			value: 110
-		},
-		{
-			name: 'O',
-			value: 111
-		},
-		{
-			name: 'P',
-			value: 112
-		},
-		{
-			name: 'Q',
-			value: 113
-		},
-		{
-			name: 'R',
-			value: 114
-		},
-		{
-			name: 'S',
-			value: 115
-		},
-		{
-			name: 'T',
-			value: 116
-		},
-		{
-			name: 'U',
-			value: 117
-		},
-		{
-			name: 'V',
-			value: 118
-		},
-		{
-			name: 'W',
-			value: 119
-		},
-		{
-			name: 'X',
-			value: 120
-		},
-		{
-			name: 'Y',
-			value: 121
-		},
-		{
-			name: 'Z',
-			value: 122
-		},
-		{
-			name: 'Enter',
-			value: 13
-		},
-		{
-			name: 'Shift',
-			value: 16
-		},
-		{
-			name: 'Control',
-			value: 17
-		},
-		{
-			name: 'Alt',
-			value: 18
-		},
-		{
-			name: 'Escape',
-			value: 27
-		},
-		{
-			name: 'Page Up',
-			value: 33
-		},
-		{
-			name: 'Page Down',
-			value: 34
-		},
-		{
-			name: 'End',
-			value: 35
-		},
-		{
-			name: 'Home',
-			value: 36
-		},
-		{
-			name: 'Left Arrow',
-			value: 37
-		},
-		{
-			name: 'Up Arrow',
-			value: 38
-		},
-		{
-			name: 'Right Arrow',
-			value: 39
-		},
-		{
-			name: 'Down Arrow',
-			value: 40
-		},
-		{
-			name: 'Insert',
-			value: 45
-		},
-		{
-			name: 'Delete',
-			value: 46
-		},
-		{
-			name: '0',
-			value: 48
-		},
-		{
-			name: '1',
-			value: 49
-		},
-		{
-			name: '2',
-			value: 50
-		},
-		{
-			name: '3',
-			value: 51
-		},
-		{
-			name: '4',
-			value: 52
-		},
-		{
-			name: '5',
-			value: 53
-		},
-		{
-			name: '6',
-			value: 54
-		},
-		{
-			name: '7',
-			value: 55
-		},
-		{
-			name: '8',
-			value: 56
-		},
-		{
-			name: '9',
-			value: 57
-		},
-	]
+	keyMap: {
+		97: 'A',
+		98: 'B',
+		99: 'C',
+		100: 'D',
+		101: 'E',
+		102: 'F',
+		103: 'G',
+		104: 'H',
+		105: 'I',
+		106: 'J',
+		107: 'K',
+		108: 'L',
+		109: 'M',
+		110: 'N',
+		111: 'O',
+		112: 'P',
+		113: 'Q',
+		114: 'R',
+		115: 'S',
+		116: 'T',
+		117: 'U',
+		118: 'V',
+		119: 'W',
+		120: 'X',
+		121: 'Y',
+		122: 'Z',
+		13: 'Enter',
+		16: 'Shift',
+		17: 'Control',
+		18: 'Alt',
+		27: 'Escape',
+		33: 'Page Up',
+		34: 'Page Down',
+		35: 'End',
+		36: 'Home',
+		37: 'Left Arrow',
+		38: 'Up Arrow',
+		39: 'Right Arrow',
+		40: 'Down Arrow',
+		45: 'Insert',
+		46: 'Delete',
+		48: '0',
+		49: '1',
+		50: '2',
+		51: '3',
+		52: '4',
+		53: '5',
+		54: '6',
+		55: '7',
+		56: '8',
+		57: '9',
+	}
 });
