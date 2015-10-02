@@ -2,7 +2,7 @@
 	<li {{bind-attr class="post.isCurrent:current post.isPrevious:previous post.isNext:next"}}>
 		<div class="display">
 			{{#if post.isImage}}
-				<img src="{{post.url}}" />
+				<div class="image" style="background-image:url({{post.url}})"></div>
 			{{/if}}
 			{{#if post.isVideo}}
 				{{{post.html}}}
