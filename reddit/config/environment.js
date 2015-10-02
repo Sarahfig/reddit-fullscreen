@@ -4,7 +4,7 @@ module.exports = function(environment) {
   var ENV = {
     contentSecurityPolicy: {
       'connect-src': "'self' https://*.reddit.com",
-      'img-src': "'self' http://*.imgur.com https://*.imgur.com http://b.thumbs.redditmedia.com",
+      'img-src': "'self' http://*.imgur.com https://*.imgur.com http://b.thumbs.redditmedia.com http://*.memegen.com",
 	  'frame-src': "'self' http://cdn.embedly.com"
     },
     modulePrefix: 'reddit',

@@ -37,7 +37,9 @@ export default Ember.Route.extend({
 		if(!parsed.media) {
 			if(parsed.url.toLowerCase().match(/\.(jpg|png|gif)/g)) {
 				parsed.isImage = true;
-			} else if(parsed.url.indexOf('//imgur.com/') !== -1) {
+			} else if(parsed.url.indexOf('imgur.com/a/')){
+				parsed.isAlbum = true;
+			} else if(parsed.url.indexOf('imgur.com/') !== -1) {
 				parsed.isImage = true;
 				parsed.url = parsed.url + '.jpg';
 			} else {
@@ -52,7 +54,8 @@ export default Ember.Route.extend({
 			if(parsed.media.oembed.type === 'video') {
 				parsed.isVideo = true;
 				parsed.html = Ember.$('<div/>').html(parsed.media.oembed.html).text();
-			} else if(parsed.url.indexOf('//imgur.com/a/')){
+			} else if(parsed.url.indexOf('imgur.com/a/')){
+
 				parsed.isAlbum = true;
 			} else {
 				console.log('unsupported media type', parsed);
