@@ -25,11 +25,11 @@ export default Ember.Controller.extend({
   actions: {
 	  nextPost: function() {
 		  this.set('currentIndex', this.currentIndex + 1);
-		  console.log('show next post', this.currentIndex, this.get('list'));
+		  console.log(this.get('list'));
 	  },
 	  previousPost: function() {
 		  this.set('currentIndex', this.currentIndex - 1);
-		  console.log('show previous post', this.currentIndex);
+		  console.log(this.get('list'));
 	  }
   }
 });

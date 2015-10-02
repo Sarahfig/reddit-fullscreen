@@ -13,6 +13,11 @@
 			{{#if post.isArticleNoThumbnail}}
 				<div>no image</div>
 			{{/if}}
+			{{#if post.isAlbum}}
+				<div class="album">
+
+				</div>
+			{{/if}}
 		</div>
 		<div class="info">
 			<a href="{{post.url}}" class="title" target="_blank">{{post.title}}</a>
