@@ -16,5 +16,13 @@ export default Ember.Component.extend({
 			this.sendAction('previousPost', e);
 			return;
 		}
+	},
+	actions: {
+		upVote: function(e) {
+			this.sendAction('upVote', e);
+		},
+		downVote: function(e) {
+			this.sendAction('downVote', e);
+		}
 	}
 });

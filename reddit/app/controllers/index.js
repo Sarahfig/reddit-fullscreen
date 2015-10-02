@@ -29,6 +29,34 @@ export default Ember.Controller.extend({
 		  if(this.currentIndex) {
 			  this.set('currentIndex', this.currentIndex - 1);
 		  }
+	  },
+	  upVote: function(post) {
+		  if(post.isUpVoted) {
+			  this.api.post.removeVote(post.id).then(function(response) {
+				  console.log('response', response);
+				  post.isUpVoted = false;
+			  });
+		  } else {
+			  this.api.post.upVote(post.id).then(function(response) {
+				  console.log('response', response);
+				  post.isUpVoted = true;
+			  });
+		  }
+		  post.isDownVoted = false;
+		  console.log('send upvote', post);
+	  },
+	  downVote: function(post) {
+		  if(post.isDownVoted) {
+			  this.api.post.removeVote(post.id).then(function() {
+				  post.isDownVoted = false;
+			  });
+		  } else {
+			  this.api.post.upVote(post.id).then(function() {
+				  post.isDownVoted = true;
+			  });
+		  }
+		  post.isUpVoted = false;
+		  console.log('send downvote', post);
 	  }
   }
 });
