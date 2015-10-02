@@ -9,7 +9,6 @@ export default Ember.Controller.extend({
 	  return this.currentIndex + 1;
   },
   list: function() {
-	  console.log('run', this.currentIndex);
 	  var list = JSON.parse(JSON.stringify(this.get('model.list')));
 	  var displayed = [];
 	  if(list[this.previousIndex()]) {
@@ -25,11 +24,11 @@ export default Ember.Controller.extend({
   actions: {
 	  nextPost: function() {
 		  this.set('currentIndex', this.currentIndex + 1);
-		  console.log(this.get('list'));
 	  },
 	  previousPost: function() {
-		  this.set('currentIndex', this.currentIndex - 1);
-		  console.log(this.get('list'));
+		  if(this.currentIndex) {
+			  this.set('currentIndex', this.currentIndex - 1);
+		  }
 	  }
   }
 });

@@ -1,22 +1,30 @@
 {{#each post in list}}
 	<li {{bind-attr class="post.isCurrent:current post.isPrevious:previous post.isNext:next"}}>
 		<div class="display">
-			{{#if post.isImage}}
-				<div class="image" style="background-image:url({{post.url}})"></div>
-			{{/if}}
-			{{#if post.isVideo}}
-				{{{post.html}}}
-			{{/if}}
-			{{#if post.isArticleThumbnail}}
-				<img src="{{post.thumbnail}}" />
-			{{/if}}
-			{{#if post.isArticleNoThumbnail}}
-				<div>no image</div>
-			{{/if}}
-			{{#if post.isAlbum}}
-				<div class="album">
+			{{#if post.isCurrent}}
+				{{#if post.isImage}}
+					<div class="image" style="background-image:url({{post.url}})"></div>
+				{{/if}}
+				{{#if post.isVideo}}
+					{{{post.html}}}
+				{{/if}}
+				{{#if post.isArticleThumbnail}}
+					<img src="{{post.thumbnail}}" />
+				{{/if}}
+				{{#if post.isArticleNoThumbnail}}
+					<div class="no-image"></div>
+				{{/if}}
+				{{#if post.isAlbum}}
+					<div class="album">
 
-				</div>
+					</div>
+				{{/if}}
+			{{else}}
+				{{#if post.hasThumbnail}}
+					<div class="image" style="background-image:url({{post.thumbnail}})"></div>
+				{{else}}
+					<div class="no-image"></div>
+				{{/if}}
 			{{/if}}
 		</div>
 		<div class="info">

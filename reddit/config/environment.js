@@ -5,7 +5,8 @@ module.exports = function(environment) {
     contentSecurityPolicy: {
       'connect-src': "'self' https://*.reddit.com",
       'img-src': "'self' http://*.imgur.com https://*.imgur.com http://b.thumbs.redditmedia.com http://*.memegen.com",
-	  'frame-src': "'self' http://cdn.embedly.com"
+	  'frame-src': "'self' http://cdn.embedly.com",
+	  'style-src': "'self' 'unsafe-inline'"
     },
     modulePrefix: 'reddit',
     environment: environment,
