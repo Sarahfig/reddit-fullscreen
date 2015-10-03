@@ -47,7 +47,7 @@ export default Ember.Route.extend({
 					} else if(parsed.url.indexOf('imgur.com/') !== -1) {
 						parsed.isImage = true;
 						parsed.url = parsed.url + '.jpg';
-					} else if (parsed.url.indexOf('livememe.com/' !== -1)) {
+					} else if (parsed.url.indexOf('livememe.com/') !== -1) {
 						parsed.isImage = true;
 						var id = parsed.url.split('com/')[1];
 						parsed.url = 'http://e.lvme.me/' + id + '.jpg';

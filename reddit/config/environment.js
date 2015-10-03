@@ -1,10 +1,21 @@
 /* jshint node: true */
 
 module.exports = function(environment) {
+	var imageSrcString = '';
+	[
+		'*.imgur.com',
+		'*.thumbs.redditmedia.com',
+		'*.memegen.com',
+		'*.gfycat.com',
+		'wattydev.com'
+	].forEach(function(item) {
+		imageSrcString += ' http://' + item + ' https://' + item;
+	});
+
   var ENV = {
     contentSecurityPolicy: {
       'connect-src': "'self' https://*.reddit.com",
-      'img-src': "'self' http://*.imgur.com https://*.imgur.com http://b.thumbs.redditmedia.com http://*.memegen.com",
+      'img-src': "'self'" + imageSrcString,
 	  'frame-src': "'self' http://cdn.embedly.com",
 	  'style-src': "'self' 'unsafe-inline'"
     },

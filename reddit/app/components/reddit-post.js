@@ -29,7 +29,6 @@ export default Ember.Component.extend({
 		if(!this.get('post')) {
 			return;
 		}
-		console.log('keypress');
 		var key = this.bindings.keyMap[e.keyCode];
 		var functions = this.bindings.functions;
 		if(key === functions.upVote.getKey()) {

@@ -17,13 +17,17 @@ export default Ember.Controller.extend({
 	  }
 	  displayed.push(list[this.currentIndex]);
 	  displayed[displayed.length - 1].isCurrent = true;
-	  displayed.push(list[this.nextIndex()]);
-	  displayed[displayed.length - 1].isNext = true;
+	  if(list[this.nextIndex()]) {
+		  displayed.push(list[this.nextIndex()]);
+		  displayed[displayed.length - 1].isNext = true;
+	  }
 	  return displayed;
   }.property('model.list', 'currentIndex'),
   actions: {
 	  nextPost: function() {
-		  this.set('currentIndex', this.currentIndex + 1);
+		  if(this.currentIndex < this.get('model.list').length - 1) {
+			  this.set('currentIndex', this.currentIndex + 1);
+		  }
 	  },
 	  previousPost: function() {
 		  if(this.currentIndex) {
