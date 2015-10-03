@@ -27,6 +27,11 @@ export default Ember.Controller.extend({
 	  nextPost: function() {
 		  if(this.currentIndex < this.get('model.list').length - 1) {
 			  this.set('currentIndex', this.currentIndex + 1);
+
+			  if(this.currentIndex === this.get('model.list').length - 2) {
+				  //load more
+				  this.send('getMore');
+			  }
 		  }
 	  },
 	  previousPost: function() {

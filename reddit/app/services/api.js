@@ -23,6 +23,9 @@ export default Ember.Service.extend({
 	front: {
 		get: function() {
 			return new Ajax().get(domain, null, auth());
+		},
+		getMore: function(after) {
+			return new Ajax().get(domain, {after:after}, auth());
 		}
 	},
 	post: {

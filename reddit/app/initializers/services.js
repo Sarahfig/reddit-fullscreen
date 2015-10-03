@@ -5,6 +5,7 @@ export function initialize(container, application) {
   //inject into routes
   application.inject('route', 'session', 'service:session');
   application.inject('route', 'api', 'service:api');
+  application.inject('route', 'parse', 'service:parser');
 
   //inject into components
   application.inject('component', 'bindings', 'service:keybindings');
