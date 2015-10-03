@@ -40,13 +40,11 @@ export default Ember.Controller.extend({
 			  }
 		  });
 		  if(post.isUpVoted) {
-			  this.api.post.removeVote(post.name).then(function() {
-				  post.isUpVoted = false;
-			  });
+			  this.api.post.removeVote(post.name);
+			  post.isUpVoted = false;
 		  } else {
-			  this.api.post.upVote(post.name).then(function() {
-				  post.isUpVoted = true;
-			  });
+			  this.api.post.upVote(post.name);
+			  post.isUpVoted = true;
 		  }
 		  post.isDownVoted = false;
 	  },
@@ -60,13 +58,11 @@ export default Ember.Controller.extend({
 			 }
 		 });
 		  if(post.isDownVoted) {
-			  this.api.post.removeVote(post.name).then(function() {
-				  post.isDownVoted = false;
-			  });
+			  this.api.post.removeVote(post.name);
+			  post.isDownVoted = false;
 		  } else {
-			  this.api.post.upVote(post.name).then(function() {
-				  post.isDownVoted = true;
-			  });
+			  this.api.post.upVote(post.name);
+			  post.isDownVoted = true;
 		  }
 		 post.isUpVoted = false;
 	  }

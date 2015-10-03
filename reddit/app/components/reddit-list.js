@@ -2,10 +2,10 @@ import Ember from 'ember';
 
 export default Ember.Component.extend({
 	init: function() {
-		Ember.$(window).keypress(Ember.run.bind(this, this.globalKeyPress));
+		Ember.$(window).keypress(Ember.run.bind(this, this.keyPress));
 		this._super.apply(this);
 	},
-	globalKeyPress: function(e) {
+	keyPress: function(e) {
 		var key = this.bindings.keyMap[e.keyCode];
 		var functions = this.bindings.functions;
 		if(key === functions.nextPost.getKey()) {
@@ -18,11 +18,11 @@ export default Ember.Component.extend({
 		}
 	},
 	actions: {
-		upVote: function(e) {
-			this.sendAction('upVote', e);
+		upVote: function() {
+			this.sendAction('upVote');
 		},
-		downVote: function(e) {
-			this.sendAction('downVote', e);
+		downVote: function() {
+			this.sendAction('downVote');
 		}
 	}
 });

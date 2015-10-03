@@ -12,7 +12,6 @@ export default Ember.Component.extend({
 		return this.get('post.isNext');
 	}.property('post.isNext'),
 	isUpVoted: function() {
-		console.log('checkupvoted');
 		return this.get('post.isUpVoted');
 	}.property('post.isUpVoted'),
 	isDownVoted: function() {
@@ -20,35 +19,37 @@ export default Ember.Component.extend({
 	}.property('post.isDownVoted'),
 	init: function() {
 		if(this.attrs.post.value.isCurrent) {
-			console.log('bind');
-			Ember.$(window).keypress(Ember.run.bind(this, this.globalKeyPress));
+			this.bindKeyPress = Ember.run.bind(this, this.globalKeyPress);
+			Ember.$(window).bind('keypress', this.bindKeyPress);
 		}
 		this._super.apply(this);
 	},
+	bindKeyPress: null,
 	globalKeyPress: function(e) {
-		console.log('keypress', this, this.get('post'));
+		if(!this.get('post')) {
+			return;
+		}
+		console.log('keypress');
 		var key = this.bindings.keyMap[e.keyCode];
 		var functions = this.bindings.functions;
 		if(key === functions.upVote.getKey()) {
-			this.sendAction('upVote', this.get('post'));
+			this.sendAction('upVote');
 			if(this.get('post.isUpVoted')) {
 				this.set('post.isUpVoted', false);
 			} else {
 				this.set('post.isUpVoted', true);
 			}
 			this.set('post.isDownVoted', false);
-			console.log('sent', this.get('post'));
 			return;
 		}
 		if(key === functions.downVote.getKey()) {
-			this.sendAction('downVote', this.get('post'));
+			this.sendAction('downVote');
 			if(this.get('post.isDownVoted')) {
 				this.set('post.isDownVoted', false);
 			} else {
 				this.set('post.isDownVoted', true);
 			}
 			this.set('post.isUpVoted', false);
-			console.log('sent', this.get('post'));
 			return;
 		}
 	},
