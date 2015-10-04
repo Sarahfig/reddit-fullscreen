@@ -32,11 +32,18 @@ export default Ember.Route.extend({
         $scope.session.set('authExpires', new Date().getTime() + (params.expires_in * 1000));
         return params.access_token;
       }
-      console.log($scope.session.auth.expires() < new Date().getTime());
       if(!$scope.session.auth.token() || $scope.session.auth.expires() < new Date().getTime()) {
         var state = Math.random().toString(36).substring(7);
         $scope.session.set('authState', state);
-        window.location.replace('https://www.reddit.com/api/v1/authorize?client_id=ZWE3iZH2TyAp8g&response_type=token&state=' + state + '&redirect_uri=http://localhost:4200/authenticate&scope=identity,edit,history,mysubreddits,read,save,submit,vote');
+		var clientId, redirectDomain;
+		if(window.location.hostname === 'localhost') {
+			clientId = 'ZWE3iZH2TyAp8g';
+			redirectDomain = 'http://localhost:4200';
+		} else {
+			clientId = '1Q-yPT8mA68PNQ';
+			redirectDomain = 'http://reddittv.wattydev.com';
+		}
+        window.location.replace('https://www.reddit.com/api/v1/authorize?client_id=' + clientId + '&response_type=token&state=' + state + '&redirect_uri=' + redirectDomain + '/authenticate&scope=identity,edit,history,mysubreddits,read,save,submit,vote');
         return false;
       }
     }
