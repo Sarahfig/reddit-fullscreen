@@ -8,8 +8,10 @@ export default Ember.Route.extend({
 	},
 	model: function() {
 		var self = this;
-		return this.api.front.get().then(function(response) {
+		var scope = this.session.account.preferences.topScope() || 'week';
+		return this.api.top.get(scope).then(function(response) {
 			var model = {};
+			model.scope = scope;
 			model.after = response.data.after;
 			model.list = self.parse.listings(response.data.children);
 			return model;
@@ -19,8 +21,9 @@ export default Ember.Route.extend({
 		self: this,
 		getMore: function() {
 			var after = this.get('context.after');
+			var scope = this.get('context.scope');
 			var self = this;
-			this.api.front.getMore(after).then(function(response) {
+			this.api.top.getMore(after, scope).then(function(response) {
 				var list = self.get('currentModel.list');
 				var newStuff = self.parse.listings(response.data.children);
 				var combined = list.concat(newStuff);
