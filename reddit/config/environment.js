@@ -14,7 +14,7 @@ module.exports = function(environment) {
 
   var ENV = {
     contentSecurityPolicy: {
-      'connect-src': "'self' https://*.reddit.com",
+      'connect-src': "'self' https://*.reddit.com https://*.imgur.com",
       'img-src': "'self'" + imageSrcString,
 	  'frame-src': "'self' http://cdn.embedly.com",
 	  'style-src': "'self' 'unsafe-inline'"

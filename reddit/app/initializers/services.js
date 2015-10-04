@@ -15,7 +15,7 @@ export function initialize(container, application) {
 
   //inject into services
   application.inject('service:api', 'session', 'service:session');
-  //application.inject('service:api', 'ajax', 'util:ajax');
+  application.inject('service:parser', 'api', 'service:api');
 }
 
 export default {

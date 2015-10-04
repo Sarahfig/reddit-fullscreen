@@ -74,7 +74,6 @@ define('reddit/components/reddit-nav', ['exports', 'ember'], function (exports, 
 
 	exports['default'] = Ember['default'].Component.extend({
 		isHot: (function () {
-			console.log('isHot', this.get('current'));
 			return this.get('current') === 'hot';
 		}).property('current'),
 		isTop: (function () {
@@ -399,7 +398,7 @@ define('reddit/initializers/services', ['exports'], function (exports) {
 
     //inject into services
     application.inject('service:api', 'session', 'service:session');
-    //application.inject('service:api', 'ajax', 'util:ajax');
+    application.inject('service:parser', 'api', 'service:api');
   }
 
   exports['default'] = {
@@ -570,59 +569,80 @@ define('reddit/services/api', ['exports', 'ember', 'reddit/utils/ajax'], functio
 
 	'use strict';
 
-	var domain = 'https://oauth.reddit.com/',
-	    base = domain + 'api/',
-	    token = function token() {
-		return 'Bearer ' + localStorage.authToken;
-	},
-	    auth = function auth() {
-		return {
-			headers: {
-				'Authorization': token()
-			}
-		};
+	var reddit = {
+		domain: 'https://oauth.reddit.com/',
+		base: function base() {
+			return this.domain + 'api/';
+		},
+		token: function token() {
+			return 'Bearer ' + localStorage.authToken;
+		},
+		auth: function auth() {
+			return {
+				headers: {
+					'Authorization': this.token()
+				}
+			};
+		}
+	};
+	var imgur = {
+		domain: 'https://api.imgur.com/',
+		base: function base() {
+			return this.domain + '3/';
+		},
+		token: 'Client-ID 5f84998ba19cca5',
+		auth: function auth() {
+			return {
+				headers: {
+					'Authorization': this.token
+				}
+			};
+		}
 	};
 
 	exports['default'] = Ember['default'].Service.extend({
 		account: {
 			getMe: function getMe() {
-				return new Ajax['default']().get(base + 'v1/me', null, auth());
+				return new Ajax['default']().get(reddit.base() + 'v1/me', null, reddit.auth());
 			}
 		},
 		front: {
 			get: function get() {
-				return new Ajax['default']().get(domain, null, auth());
+				return new Ajax['default']().get(reddit.domain, null, reddit.auth());
 			},
 			getMore: function getMore(after) {
-				return new Ajax['default']().get(domain, { after: after }, auth());
+				return new Ajax['default']().get(reddit.domain, { after: after }, reddit.auth());
 			}
 		},
 		top: {
 			get: function get(scope) {
-				return new Ajax['default']().get(domain + '/top', { t: scope }, auth());
+				return new Ajax['default']().get(reddit.domain + '/top', { t: scope }, reddit.auth());
 			},
 			getMore: function getMore(after, scope) {
-				return new Ajax['default']().get(domain + '/top', { t: scope, after: after }, auth());
+				return new Ajax['default']().get(reddit.domain + '/top', { t: scope, after: after }, reddit.auth());
 			}
 		},
 		post: {
 			upVote: function upVote(id) {
-				return new Ajax['default']().post(base + 'vote', {
+				return new Ajax['default']().post(reddit.base() + 'vote', {
 					id: id,
 					dir: 1
-				}, auth());
+				}, reddit.auth());
 			},
 			downVote: function downVote(id) {
-				return new Ajax['default']().post(base + 'vote', {
+				return new Ajax['default']().post(reddit.base() + 'vote', {
 					id: id,
 					dir: -1
-				}, auth());
+				}, reddit.auth());
 			},
 			removeVote: function removeVote(id) {
-				return new Ajax['default']().post(base + 'vote', {
+				return new Ajax['default']().post(reddit.base() + 'vote', {
 					id: id,
 					dir: 0
-				}, auth());
+				}, reddit.auth());
+			},
+			getImgurAlbum: function getImgurAlbum(id) {
+				return new Ajax['default']().get(imgur.base() + 'album/' + id, null, imgur.auth());
 			}
 		}
 	});
@@ -730,6 +750,7 @@ define('reddit/services/parser', ['exports', 'ember'], function (exports, Ember)
 
 	exports['default'] = Ember['default'].Service.extend({
 		listings: function listings(list) {
+			var self = this;
 			return list.map(function (item) {
 				var data = item.data,
 				    parsed = {
@@ -764,6 +785,7 @@ define('reddit/services/parser', ['exports', 'ember'], function (exports, Ember)
 						parsed.isImage = true;
 					} else if (parsed.url.indexOf('imgur.com/a/') !== -1) {
 						parsed.isAlbum = true;
+						self.album(parsed);
 					} else if (parsed.url.indexOf('imgur.com/') !== -1) {
 						parsed.isImage = true;
 						parsed.url = parsed.url + '.jpg';
@@ -784,12 +806,26 @@ define('reddit/services/parser', ['exports', 'ember'], function (exports, Ember)
 						parsed.isVideo = true;
 						parsed.html = Ember['default'].$('<div/>').html(parsed.media.oembed.html).text();
 					} else if (parsed.url.indexOf('imgur.com/a/') !== -1) {
+
 						parsed.isAlbum = true;
+						self.album(parsed);
 					} else {
+						parsed.isArticle = true;
+						if (parsed.thumbnail === 'self' || !parsed.thumbnail) {
+							parsed.isArticleNoThumbnail = true;
+						} else {
+							parsed.isArticleThumbnail = true;
+						}
 						console.log('unsupported media type', parsed);
 					}
 				}
 				return parsed;
+			});
+		},
+		album: function album(parsed) {
+			var id = parsed.url.split('a/')[1];
+			this.api.post.getImgurAlbum(id).then(function (response) {
+				parsed.album = response.data.images;
 			});
 		}
 	});
@@ -2837,7 +2873,7 @@ catch(err) {
 if (runningTests) {
   require("reddit/tests/test-helper");
 } else {
-  require("reddit/app")["default"].create({"name":"reddit","version":"0.0.0+e3c79a09"});
+  require("reddit/app")["default"].create({"name":"reddit","version":"0.0.0+e04c72ad"});
 }
 
 /* jshint ignore:end */
