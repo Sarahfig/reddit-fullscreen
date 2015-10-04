@@ -13,9 +13,7 @@
 			<div class="no-image"></div>
 		{{/if}}
 		{{#if post.isAlbum}}
-			<div class="album">
-
-			</div>
+			{{imgur-album elementId="album" album=post.album}}
 		{{/if}}
 	{{else}}
 		{{#if post.hasThumbnail}}

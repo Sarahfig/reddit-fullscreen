@@ -87,4 +87,42 @@ body {
 #list .previous {
   right: 95%;
 }
+nav ul {
+  position: absolute;
+  top: .75vh;
+  width: 100%;
+  text-align: center;
+}
+nav ul li {
+  display: inline-block;
+  margin: 0 5px;
+}
+nav ul li a {
+  color: #cdcdcd;
+  transition: .3s color;
+}
+nav ul li a:hover {
+  color: #fff;
+}
+nav ul li.current a {
+  color: #fff;
+  text-decoration: underline;
+}
+#album {
+  position: relative;
+}
+.album-image {
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.album-nav {
+  position: relative;
+  background: rgba(0, 0, 0, 0.5);
+}
 /*# sourceMappingURL=/assets/reddit.css.map */

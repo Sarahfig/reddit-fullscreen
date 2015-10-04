@@ -19,12 +19,10 @@ export default Ember.Component.extend({
 	}.property('post.isDownVoted'),
 	init: function() {
 		if(this.attrs.post.value.isCurrent) {
-			this.bindKeyPress = Ember.run.bind(this, this.globalKeyPress);
-			Ember.$(window).bind('keypress', this.bindKeyPress);
+			Ember.$(window).bind('keypress', Ember.run.bind(this, this.globalKeyPress));
 		}
 		this._super.apply(this);
 	},
-	bindKeyPress: null,
 	globalKeyPress: function(e) {
 		if(!this.get('post')) {
 			return;

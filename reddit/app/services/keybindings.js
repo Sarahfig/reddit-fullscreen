@@ -33,6 +33,16 @@ export default Ember.Service.extend({
 			default: 'S',
 			description: 'Downvote currently viewed post',
 			name: 'keyDownVote'
+		}),
+		nextImage: new KeyFunction({
+			default: 'E',
+			description: 'Move to next image in album',
+			name: 'keyNextImage'
+		}),
+		previousImage: new KeyFunction({
+			default: 'Q',
+			description: 'Move to previous image in album',
+			name: 'keyPreviousImage'
 		})
 	},
 	keyMap: {

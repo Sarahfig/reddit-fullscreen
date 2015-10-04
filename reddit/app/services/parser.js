@@ -2,7 +2,8 @@ import Ember from 'ember';
 
 export default Ember.Service.extend({
 	listings: function(list) {
-		return list.map(function(item) {
+		var self = this;
+		var mapped = list.map(function(item) {
 			var data = item.data,
 			parsed = {
 				author: data.author,
@@ -36,6 +37,7 @@ export default Ember.Service.extend({
 					parsed.isImage = true;
 				} else if(parsed.url.indexOf('imgur.com/a/') !== -1){
 					parsed.isAlbum = true;
+					self.album(parsed);
 				} else if(parsed.url.indexOf('imgur.com/') !== -1) {
 					parsed.isImage = true;
 					parsed.url = parsed.url + '.jpg';
@@ -56,12 +58,37 @@ export default Ember.Service.extend({
 					parsed.isVideo = true;
 					parsed.html = Ember.$('<div/>').html(parsed.media.oembed.html).text();
 				} else if(parsed.url.indexOf('imgur.com/a/') !== -1){
+
 					parsed.isAlbum = true;
+					self.album(parsed);
 				} else {
+					parsed.isArticle = true;
+					if(parsed.thumbnail === 'self' || !parsed.thumbnail) {
+						parsed.isArticleNoThumbnail = true;
+					} else {
+						parsed.isArticleThumbnail = true;
+					}
 					console.log('unsupported media type', parsed);
 				}
 			}
 			return parsed;
+		});
+
+		// return mapped.filter(function(item) {
+		// 	if(item.isAlbum) {
+		// 		return true;
+		// 	} else {
+		// 		return false;
+		// 	}
+		// });
+
+		return mapped;
+	},
+	album: function(parsed) {
+		var id = parsed.url.split('a/')[1];
+		this.api.post.getImgurAlbum(id).then(function(response) {
+			parsed.album = response.data.images;
+			console.log('album', parsed);
 		});
 	}
 });
