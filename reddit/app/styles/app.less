@@ -1,5 +1,6 @@
 @white: #fff;
 @grayLighter: #f1f1f1;
+@gray: #cdcdcd;
 @grayDarker: #444;
 @black: #000;
 
@@ -96,5 +97,29 @@ body {
 	}
 	.previous {
 		right: 95%;
+	}
+}
+nav ul{
+	position:absolute;
+	top: .75vh;
+	width: 100%;
+	text-align:center;
+
+	li {
+		display:inline-block;
+		margin: 0 5px;
+
+		a {
+			color: @gray;
+			transition: .3s color;
+
+			&:hover {
+				color: @white;
+			}
+		}
+		&.current a{
+			color: @white;
+			text-decoration: underline;
+		}
 	}
 }

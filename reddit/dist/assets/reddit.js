@@ -68,6 +68,21 @@ define('reddit/components/reddit-list', ['exports', 'ember'], function (exports,
 	});
 
 });
+define('reddit/components/reddit-nav', ['exports', 'ember'], function (exports, Ember) {
+
+	'use strict';
+
+	exports['default'] = Ember['default'].Component.extend({
+		isHot: (function () {
+			console.log('isHot', this.get('current'));
+			return this.get('current') === 'hot';
+		}).property('current'),
+		isTop: (function () {
+			return this.get('current') === 'top';
+		}).property('current')
+	});
+
+});
 define('reddit/components/reddit-post', ['exports', 'ember'], function (exports, Ember) {
 
 	'use strict';
@@ -1021,6 +1036,77 @@ define('reddit/templates/components/reddit-list', ['exports'], function (exports
   }()));
 
 });
+define('reddit/templates/components/reddit-nav', ['exports'], function (exports) {
+
+  'use strict';
+
+  exports['default'] = Ember.HTMLBars.template((function() {
+    return {
+      meta: {
+        "revision": "Ember@1.13.7",
+        "loc": {
+          "source": null,
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 5,
+            "column": 0
+          }
+        },
+        "moduleName": "reddit/templates/components/reddit-nav.hbs"
+      },
+      arity: 0,
+      cachedFragment: null,
+      hasRendered: false,
+      buildFragment: function buildFragment(dom) {
+        var el0 = dom.createDocumentFragment();
+        var el1 = dom.createElement("ul");
+        var el2 = dom.createTextNode("\n	");
+        dom.appendChild(el1, el2);
+        var el2 = dom.createElement("li");
+        var el3 = dom.createElement("a");
+        dom.setAttribute(el3,"href","/");
+        var el4 = dom.createTextNode("Hot");
+        dom.appendChild(el3, el4);
+        dom.appendChild(el2, el3);
+        dom.appendChild(el1, el2);
+        var el2 = dom.createTextNode("\n	");
+        dom.appendChild(el1, el2);
+        var el2 = dom.createElement("li");
+        var el3 = dom.createElement("a");
+        dom.setAttribute(el3,"href","/top");
+        var el4 = dom.createTextNode("Top");
+        dom.appendChild(el3, el4);
+        dom.appendChild(el2, el3);
+        dom.appendChild(el1, el2);
+        var el2 = dom.createTextNode("\n");
+        dom.appendChild(el1, el2);
+        dom.appendChild(el0, el1);
+        var el1 = dom.createTextNode("\n");
+        dom.appendChild(el0, el1);
+        return el0;
+      },
+      buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+        var element0 = dom.childAt(fragment, [0]);
+        var element1 = dom.childAt(element0, [1]);
+        var element2 = dom.childAt(element0, [3]);
+        var morphs = new Array(2);
+        morphs[0] = dom.createAttrMorph(element1, 'class');
+        morphs[1] = dom.createAttrMorph(element2, 'class');
+        return morphs;
+      },
+      statements: [
+        ["attribute","class",["concat",[["subexpr","if",[["get","isHot",[]],"current",""],[],[]]]]],
+        ["attribute","class",["concat",[["subexpr","if",[["get","isTop",[]],"current",""],[],[]]]]]
+      ],
+      locals: [],
+      templates: []
+    };
+  }()));
+
+});
 define('reddit/templates/components/reddit-post', ['exports'], function (exports) {
 
   'use strict';
@@ -1496,7 +1582,7 @@ define('reddit/templates/index', ['exports'], function (exports) {
             "column": 0
           },
           "end": {
-            "line": 2,
+            "line": 3,
             "column": 0
           }
         },
@@ -1511,16 +1597,22 @@ define('reddit/templates/index', ['exports'], function (exports) {
         dom.appendChild(el0, el1);
         var el1 = dom.createTextNode("\n");
         dom.appendChild(el0, el1);
+        var el1 = dom.createComment("");
+        dom.appendChild(el0, el1);
+        var el1 = dom.createTextNode("\n");
+        dom.appendChild(el0, el1);
         return el0;
       },
       buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
-        var morphs = new Array(1);
+        var morphs = new Array(2);
         morphs[0] = dom.createMorphAt(fragment,0,0,contextualElement);
+        morphs[1] = dom.createMorphAt(fragment,2,2,contextualElement);
         dom.insertBoundary(fragment, 0);
         return morphs;
       },
       statements: [
-        ["inline","reddit-list",[],["tagName","ul","elementId","list","list",["subexpr","@mut",[["get","list",["loc",[null,[1,49],[1,53]]]]],[],[]],"nextPost","nextPost","previousPost","previousPost","upVote","upVote","downVote","downVote"],["loc",[null,[1,0],[1,139]]]]
+        ["inline","reddit-nav",[],["tagName","nav","current","hot"],["loc",[null,[1,0],[1,42]]]],
+        ["inline","reddit-list",[],["tagName","ul","elementId","list","list",["subexpr","@mut",[["get","list",["loc",[null,[2,49],[2,53]]]]],[],[]],"nextPost","nextPost","previousPost","previousPost","upVote","upVote","downVote","downVote"],["loc",[null,[2,0],[2,139]]]]
       ],
       locals: [],
       templates: []
@@ -1543,7 +1635,7 @@ define('reddit/templates/top', ['exports'], function (exports) {
             "column": 0
           },
           "end": {
-            "line": 2,
+            "line": 3,
             "column": 0
           }
         },
@@ -1558,16 +1650,22 @@ define('reddit/templates/top', ['exports'], function (exports) {
         dom.appendChild(el0, el1);
         var el1 = dom.createTextNode("\n");
         dom.appendChild(el0, el1);
+        var el1 = dom.createComment("");
+        dom.appendChild(el0, el1);
+        var el1 = dom.createTextNode("\n");
+        dom.appendChild(el0, el1);
         return el0;
       },
       buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
-        var morphs = new Array(1);
+        var morphs = new Array(2);
         morphs[0] = dom.createMorphAt(fragment,0,0,contextualElement);
+        morphs[1] = dom.createMorphAt(fragment,2,2,contextualElement);
         dom.insertBoundary(fragment, 0);
         return morphs;
       },
       statements: [
-        ["inline","reddit-list",[],["tagName","ul","elementId","list","list",["subexpr","@mut",[["get","list",["loc",[null,[1,49],[1,53]]]]],[],[]],"nextPost","nextPost","previousPost","previousPost","upVote","upVote","downVote","downVote"],["loc",[null,[1,0],[1,139]]]]
+        ["inline","reddit-nav",[],["tagName","nav","current","top"],["loc",[null,[1,0],[1,42]]]],
+        ["inline","reddit-list",[],["tagName","ul","elementId","list","list",["subexpr","@mut",[["get","list",["loc",[null,[2,49],[2,53]]]]],[],[]],"nextPost","nextPost","previousPost","previousPost","upVote","upVote","downVote","downVote"],["loc",[null,[2,0],[2,139]]]]
       ],
       locals: [],
       templates: []
@@ -1592,6 +1690,16 @@ define('reddit/tests/components/reddit-list.jshint', function () {
   QUnit.module('JSHint - components');
   QUnit.test('components/reddit-list.js should pass jshint', function(assert) { 
     assert.ok(true, 'components/reddit-list.js should pass jshint.'); 
+  });
+
+});
+define('reddit/tests/components/reddit-nav.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - components');
+  QUnit.test('components/reddit-nav.js should pass jshint', function(assert) { 
+    assert.ok(true, 'components/reddit-nav.js should pass jshint.'); 
   });
 
 });
@@ -1832,6 +1940,149 @@ define('reddit/tests/integration/components/reddit-list-test.jshint', function (
   QUnit.module('JSHint - integration/components');
   QUnit.test('integration/components/reddit-list-test.js should pass jshint', function(assert) { 
     assert.ok(true, 'integration/components/reddit-list-test.js should pass jshint.'); 
+  });
+
+});
+define('reddit/tests/integration/components/reddit-nav-test', ['ember-qunit'], function (ember_qunit) {
+
+  'use strict';
+
+  ember_qunit.moduleForComponent('reddit-nav', 'Integration | Component | reddit nav', {
+    integration: true
+  });
+
+  ember_qunit.test('it renders', function (assert) {
+    assert.expect(2);
+
+    // Set any properties with this.set('myProperty', 'value');
+    // Handle any actions with this.on('myAction', function(val) { ... });
+
+    this.render(Ember.HTMLBars.template((function () {
+      return {
+        meta: {
+          'revision': 'Ember@1.13.7',
+          'loc': {
+            'source': null,
+            'start': {
+              'line': 1,
+              'column': 0
+            },
+            'end': {
+              'line': 1,
+              'column': 14
+            }
+          }
+        },
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createComment('');
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var morphs = new Array(1);
+          morphs[0] = dom.createMorphAt(fragment, 0, 0, contextualElement);
+          dom.insertBoundary(fragment, 0);
+          dom.insertBoundary(fragment, null);
+          return morphs;
+        },
+        statements: [['content', 'reddit-nav', ['loc', [null, [1, 0], [1, 14]]]]],
+        locals: [],
+        templates: []
+      };
+    })()));
+
+    assert.equal(this.$().text().trim(), '');
+
+    // Template block usage:
+    this.render(Ember.HTMLBars.template((function () {
+      var child0 = (function () {
+        return {
+          meta: {
+            'revision': 'Ember@1.13.7',
+            'loc': {
+              'source': null,
+              'start': {
+                'line': 2,
+                'column': 4
+              },
+              'end': {
+                'line': 4,
+                'column': 4
+              }
+            }
+          },
+          arity: 0,
+          cachedFragment: null,
+          hasRendered: false,
+          buildFragment: function buildFragment(dom) {
+            var el0 = dom.createDocumentFragment();
+            var el1 = dom.createTextNode('      template block text\n');
+            dom.appendChild(el0, el1);
+            return el0;
+          },
+          buildRenderNodes: function buildRenderNodes() {
+            return [];
+          },
+          statements: [],
+          locals: [],
+          templates: []
+        };
+      })();
+
+      return {
+        meta: {
+          'revision': 'Ember@1.13.7',
+          'loc': {
+            'source': null,
+            'start': {
+              'line': 1,
+              'column': 0
+            },
+            'end': {
+              'line': 5,
+              'column': 2
+            }
+          }
+        },
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createTextNode('\n');
+          dom.appendChild(el0, el1);
+          var el1 = dom.createComment('');
+          dom.appendChild(el0, el1);
+          var el1 = dom.createTextNode('  ');
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var morphs = new Array(1);
+          morphs[0] = dom.createMorphAt(fragment, 1, 1, contextualElement);
+          return morphs;
+        },
+        statements: [['block', 'reddit-nav', [], [], 0, null, ['loc', [null, [2, 4], [4, 19]]]]],
+        locals: [],
+        templates: [child0]
+      };
+    })()));
+
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
+
+});
+define('reddit/tests/integration/components/reddit-nav-test.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - integration/components');
+  QUnit.test('integration/components/reddit-nav-test.js should pass jshint', function(assert) { 
+    assert.ok(true, 'integration/components/reddit-nav-test.js should pass jshint.'); 
   });
 
 });
@@ -2586,7 +2837,7 @@ catch(err) {
 if (runningTests) {
   require("reddit/tests/test-helper");
 } else {
-  require("reddit/app")["default"].create({"name":"reddit","version":"0.0.0+32ea97e1"});
+  require("reddit/app")["default"].create({"name":"reddit","version":"0.0.0+e3c79a09"});
 }
 
 /* jshint ignore:end */

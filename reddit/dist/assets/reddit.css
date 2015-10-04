@@ -87,4 +87,25 @@ body {
 #list .previous {
   right: 95%;
 }
+nav ul {
+  position: absolute;
+  top: .75vh;
+  width: 100%;
+  text-align: center;
+}
+nav ul li {
+  display: inline-block;
+  margin: 0 5px;
+}
+nav ul li a {
+  color: #cdcdcd;
+  transition: .3s color;
+}
+nav ul li a:hover {
+  color: #fff;
+}
+nav ul li.current a {
+  color: #fff;
+  text-decoration: underline;
+}
 /*# sourceMappingURL=/assets/reddit.css.map */
