@@ -57,6 +57,12 @@ export default Ember.Service.extend({
 				if(parsed.media.oembed.type === 'video') {
 					parsed.isVideo = true;
 					parsed.html = Ember.$('<div/>').html(parsed.media.oembed.html).text();
+					var html = parsed.html;
+					if(html.indexOf('youtube.com') > -1) {
+						var insertAt = html.indexOf('&schema=youtube');
+						var newhtml = [html.slice(0, insertAt), '&autoplay=1', html.slice(insertAt)].join('');
+						parsed.html = newhtml;
+					}
 				} else if(parsed.url.indexOf('imgur.com/a/') !== -1){
 
 					parsed.isAlbum = true;
@@ -73,22 +79,12 @@ export default Ember.Service.extend({
 			}
 			return parsed;
 		});
-
-		// return mapped.filter(function(item) {
-		// 	if(item.isAlbum) {
-		// 		return true;
-		// 	} else {
-		// 		return false;
-		// 	}
-		// });
-
 		return mapped;
 	},
 	album: function(parsed) {
 		var id = parsed.url.split('a/')[1];
 		this.api.post.getImgurAlbum(id).then(function(response) {
 			parsed.album = response.data.images;
-			console.log('album', parsed);
 		});
 	}
 });
