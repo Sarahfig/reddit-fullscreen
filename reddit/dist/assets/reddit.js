@@ -863,6 +863,12 @@ define('reddit/services/parser', ['exports', 'ember'], function (exports, Ember)
 					if (parsed.media.oembed.type === 'video') {
 						parsed.isVideo = true;
 						parsed.html = Ember['default'].$('<div/>').html(parsed.media.oembed.html).text();
+						var html = parsed.html;
+						if (html.indexOf('youtube.com') > -1) {
+							var insertAt = html.indexOf('&schema=youtube');
+							var newhtml = [html.slice(0, insertAt), '&autoplay=1', html.slice(insertAt)].join('');
+							parsed.html = newhtml;
+						}
 					} else if (parsed.url.indexOf('imgur.com/a/') !== -1) {
 
 						parsed.isAlbum = true;
@@ -879,22 +885,12 @@ define('reddit/services/parser', ['exports', 'ember'], function (exports, Ember)
 				}
 				return parsed;
 			});
-
-			// return mapped.filter(function(item) {
-			// 	if(item.isAlbum) {
-			// 		return true;
-			// 	} else {
-			// 		return false;
-			// 	}
-			// });
-
 			return mapped;
 		},
 		album: function album(parsed) {
 			var id = parsed.url.split('a/')[1];
 			this.api.post.getImgurAlbum(id).then(function (response) {
 				parsed.album = response.data.images;
-				console.log('album', parsed);
 			});
 		}
 	});
@@ -3162,7 +3158,7 @@ catch(err) {
 if (runningTests) {
   require("reddit/tests/test-helper");
 } else {
-  require("reddit/app")["default"].create({"name":"reddit","version":"0.0.0+f630a193"});
+  require("reddit/app")["default"].create({"name":"reddit","version":"0.0.0+99522fce"});
 }
 
 /* jshint ignore:end */
