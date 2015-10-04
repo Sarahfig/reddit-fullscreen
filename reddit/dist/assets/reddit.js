@@ -3162,7 +3162,7 @@ catch(err) {
 if (runningTests) {
   require("reddit/tests/test-helper");
 } else {
-  require("reddit/app")["default"].create({"name":"reddit","version":"0.0.0+e04c72ad"});
+  require("reddit/app")["default"].create({"name":"reddit","version":"0.0.0+f630a193"});
 }
 
 /* jshint ignore:end */
