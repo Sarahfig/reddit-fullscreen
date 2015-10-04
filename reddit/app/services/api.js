@@ -28,6 +28,14 @@ export default Ember.Service.extend({
 			return new Ajax().get(domain, {after:after}, auth());
 		}
 	},
+	top: {
+		get: function(scope) {
+			return new Ajax().get(domain + '/top', {t:scope}, auth());
+		},
+		getMore: function(after, scope) {
+			return new Ajax().get(domain + '/top', {t:scope, after:after}, auth());
+		}
+	},
 	post: {
 		upVote: function(id) {
 			return new Ajax().post(base + 'vote', {

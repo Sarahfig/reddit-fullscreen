@@ -232,6 +232,89 @@ define('reddit/controllers/object', ['exports', 'ember'], function (exports, Emb
 	exports['default'] = Ember['default'].Controller;
 
 });
+define('reddit/controllers/top', ['exports', 'ember'], function (exports, Ember) {
+
+  'use strict';
+
+  exports['default'] = Ember['default'].Controller.extend({
+    currentIndex: 0,
+    previousIndex: function previousIndex() {
+      return this.currentIndex - 1;
+    },
+    nextIndex: function nextIndex() {
+      return this.currentIndex + 1;
+    },
+    list: (function () {
+      var list = JSON.parse(JSON.stringify(this.get('model.list')));
+      var displayed = [];
+      if (list[this.previousIndex()]) {
+        displayed.push(list[this.previousIndex()]);
+        displayed[0].isPrevious = true;
+      }
+      displayed.push(list[this.currentIndex]);
+      displayed[displayed.length - 1].isCurrent = true;
+      if (list[this.nextIndex()]) {
+        displayed.push(list[this.nextIndex()]);
+        displayed[displayed.length - 1].isNext = true;
+      }
+      return displayed;
+    }).property('model.list', 'currentIndex'),
+    actions: {
+      nextPost: function nextPost() {
+        if (this.currentIndex < this.get('model.list').length - 1) {
+          this.set('currentIndex', this.currentIndex + 1);
+
+          if (this.currentIndex === this.get('model.list').length - 2) {
+            //load more
+            this.send('getMore');
+          }
+        }
+      },
+      previousPost: function previousPost() {
+        if (this.currentIndex) {
+          this.set('currentIndex', this.currentIndex - 1);
+        }
+      },
+      upVote: function upVote() {
+        var list = this.get('model.list');
+        var current = this.get('currentIndex');
+        var post = null;
+        list.forEach(function (item, index) {
+          if (index === current) {
+            post = item;
+          }
+        });
+        if (post.isUpVoted) {
+          this.api.post.removeVote(post.name);
+          post.isUpVoted = false;
+        } else {
+          this.api.post.upVote(post.name);
+          post.isUpVoted = true;
+        }
+        post.isDownVoted = false;
+      },
+      downVote: function downVote() {
+        var list = this.get('model.list');
+        var current = this.get('currentIndex');
+        var post = null;
+        list.forEach(function (item, index) {
+          if (index === current) {
+            post = item;
+          }
+        });
+        if (post.isDownVoted) {
+          this.api.post.removeVote(post.name);
+          post.isDownVoted = false;
+        } else {
+          this.api.post.upVote(post.name);
+          post.isDownVoted = true;
+        }
+        post.isUpVoted = false;
+      }
+    }
+  });
+
+});
 define('reddit/initializers/app-version', ['exports', 'ember-cli-app-version/initializer-factory', 'reddit/config/environment'], function (exports, initializerFactory, config) {
 
   'use strict';
@@ -329,6 +412,7 @@ define('reddit/router', ['exports', 'ember', 'reddit/config/environment'], funct
   Router.map(function () {
     this.route('index', { path: '/' });
     this.route('authenticate');
+    this.route('top');
   });
 
   exports['default'] = Router;
@@ -424,7 +508,44 @@ define('reddit/routes/index', ['exports', 'ember'], function (exports, Ember) {
 					var newStuff = self.parse.listings(response.data.children);
 					var combined = list.concat(newStuff);
 					self.set('currentModel.list', combined);
-					console.log('got more shit!');
+				});
+			}
+		}
+	});
+
+});
+define('reddit/routes/top', ['exports', 'ember'], function (exports, Ember) {
+
+	'use strict';
+
+	exports['default'] = Ember['default'].Route.extend({
+		beforeModel: function beforeModel() {
+			if (this.session.auth.needed()) {
+				this.transitionTo('authenticate');
+			}
+		},
+		model: function model() {
+			var self = this;
+			var scope = this.session.account.preferences.topScope() || 'week';
+			return this.api.top.get(scope).then(function (response) {
+				var model = {};
+				model.scope = scope;
+				model.after = response.data.after;
+				model.list = self.parse.listings(response.data.children);
+				return model;
+			});
+		},
+		actions: {
+			self: undefined,
+			getMore: function getMore() {
+				var after = this.get('context.after');
+				var scope = this.get('context.scope');
+				var self = this;
+				this.api.top.getMore(after, scope).then(function (response) {
+					var list = self.get('currentModel.list');
+					var newStuff = self.parse.listings(response.data.children);
+					var combined = list.concat(newStuff);
+					self.set('currentModel.list', combined);
 				});
 			}
 		}
@@ -460,6 +581,14 @@ define('reddit/services/api', ['exports', 'ember', 'reddit/utils/ajax'], functio
 			},
 			getMore: function getMore(after) {
 				return new Ajax['default']().get(domain, { after: after }, auth());
+			}
+		},
+		top: {
+			get: function get(scope) {
+				return new Ajax['default']().get(domain + '/top', { t: scope }, auth());
+			},
+			getMore: function getMore(after, scope) {
+				return new Ajax['default']().get(domain + '/top', { t: scope, after: after }, auth());
 			}
 		},
 		post: {
@@ -680,6 +809,14 @@ define('reddit/services/session', ['exports', 'ember'], function (exports, Ember
           return null;
         }
         return JSON.parse(localStorage.accountUser);
+      },
+      preferences: {
+        topScope: function topScope() {
+          if (!localStorage.preferencesTopScope) {
+            return null;
+          }
+          return localStorage.preferencesTopScope;
+        }
       }
     },
     set: function set(property, value) {
@@ -1392,6 +1529,53 @@ define('reddit/templates/index', ['exports'], function (exports) {
   }()));
 
 });
+define('reddit/templates/top', ['exports'], function (exports) {
+
+  'use strict';
+
+  exports['default'] = Ember.HTMLBars.template((function() {
+    return {
+      meta: {
+        "revision": "Ember@1.13.7",
+        "loc": {
+          "source": null,
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 2,
+            "column": 0
+          }
+        },
+        "moduleName": "reddit/templates/top.hbs"
+      },
+      arity: 0,
+      cachedFragment: null,
+      hasRendered: false,
+      buildFragment: function buildFragment(dom) {
+        var el0 = dom.createDocumentFragment();
+        var el1 = dom.createComment("");
+        dom.appendChild(el0, el1);
+        var el1 = dom.createTextNode("\n");
+        dom.appendChild(el0, el1);
+        return el0;
+      },
+      buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+        var morphs = new Array(1);
+        morphs[0] = dom.createMorphAt(fragment,0,0,contextualElement);
+        dom.insertBoundary(fragment, 0);
+        return morphs;
+      },
+      statements: [
+        ["inline","reddit-list",[],["tagName","ul","elementId","list","list",["subexpr","@mut",[["get","list",["loc",[null,[1,49],[1,53]]]]],[],[]],"nextPost","nextPost","previousPost","previousPost","upVote","upVote","downVote","downVote"],["loc",[null,[1,0],[1,139]]]]
+      ],
+      locals: [],
+      templates: []
+    };
+  }()));
+
+});
 define('reddit/tests/app.jshint', function () {
 
   'use strict';
@@ -1439,6 +1623,16 @@ define('reddit/tests/controllers/index.jshint', function () {
   QUnit.module('JSHint - controllers');
   QUnit.test('controllers/index.js should pass jshint', function(assert) { 
     assert.ok(true, 'controllers/index.js should pass jshint.'); 
+  });
+
+});
+define('reddit/tests/controllers/top.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - controllers');
+  QUnit.test('controllers/top.js should pass jshint', function(assert) { 
+    assert.ok(true, 'controllers/top.js should pass jshint.'); 
   });
 
 });
@@ -1835,6 +2029,16 @@ define('reddit/tests/routes/index.jshint', function () {
   });
 
 });
+define('reddit/tests/routes/top.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - routes');
+  QUnit.test('routes/top.js should pass jshint', function(assert) { 
+    assert.ok(true, 'routes/top.js should pass jshint.'); 
+  });
+
+});
 define('reddit/tests/services/api.jshint', function () {
 
   'use strict';
@@ -1967,6 +2171,32 @@ define('reddit/tests/unit/controllers/index-test.jshint', function () {
   QUnit.module('JSHint - unit/controllers');
   QUnit.test('unit/controllers/index-test.js should pass jshint', function(assert) { 
     assert.ok(true, 'unit/controllers/index-test.js should pass jshint.'); 
+  });
+
+});
+define('reddit/tests/unit/controllers/top-test', ['ember-qunit'], function (ember_qunit) {
+
+  'use strict';
+
+  ember_qunit.moduleFor('controller:top', {
+    // Specify the other units that are required for this test.
+    // needs: ['controller:foo']
+  });
+
+  // Replace this with your real tests.
+  ember_qunit.test('it exists', function (assert) {
+    var controller = this.subject();
+    assert.ok(controller);
+  });
+
+});
+define('reddit/tests/unit/controllers/top-test.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - unit/controllers');
+  QUnit.test('unit/controllers/top-test.js should pass jshint', function(assert) { 
+    assert.ok(true, 'unit/controllers/top-test.js should pass jshint.'); 
   });
 
 });
@@ -2103,6 +2333,31 @@ define('reddit/tests/unit/routes/index-test.jshint', function () {
   QUnit.module('JSHint - unit/routes');
   QUnit.test('unit/routes/index-test.js should pass jshint', function(assert) { 
     assert.ok(true, 'unit/routes/index-test.js should pass jshint.'); 
+  });
+
+});
+define('reddit/tests/unit/routes/top-test', ['ember-qunit'], function (ember_qunit) {
+
+  'use strict';
+
+  ember_qunit.moduleFor('route:top', 'Unit | Route | top', {
+    // Specify the other units that are required for this test.
+    // needs: ['controller:foo']
+  });
+
+  ember_qunit.test('it exists', function (assert) {
+    var route = this.subject();
+    assert.ok(route);
+  });
+
+});
+define('reddit/tests/unit/routes/top-test.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - unit/routes');
+  QUnit.test('unit/routes/top-test.js should pass jshint', function(assert) { 
+    assert.ok(true, 'unit/routes/top-test.js should pass jshint.'); 
   });
 
 });
