@@ -134,14 +134,6 @@ define('reddit/controllers/array', ['exports', 'ember'], function (exports, Embe
 	exports['default'] = Ember['default'].Controller;
 
 });
-define('reddit/controllers/authenticate', ['exports', 'ember'], function (exports, Ember) {
-
-	'use strict';
-
-	console.log('authenticate');
-	exports['default'] = Ember['default'].Controller.extend({});
-
-});
 define('reddit/controllers/index', ['exports', 'ember'], function (exports, Ember) {
 
 	'use strict';
@@ -467,11 +459,18 @@ define('reddit/routes/authenticate', ['exports', 'ember'], function (exports, Em
           $scope.session.set('authExpires', new Date().getTime() + params.expires_in * 1000);
           return params.access_token;
         }
-        console.log($scope.session.auth.expires() < new Date().getTime());
         if (!$scope.session.auth.token() || $scope.session.auth.expires() < new Date().getTime()) {
           var state = Math.random().toString(36).substring(7);
           $scope.session.set('authState', state);
-          window.location.replace('https://www.reddit.com/api/v1/authorize?client_id=ZWE3iZH2TyAp8g&response_type=token&state=' + state + '&redirect_uri=http://localhost:4200/authenticate&scope=identity,edit,history,mysubreddits,read,save,submit,vote');
+          var clientId, redirectDomain;
+          if (window.location.hostname === 'localhost') {
+            clientId = 'ZWE3iZH2TyAp8g';
+            redirectDomain = 'http://localhost:4200';
+          } else {
+            clientId = '1Q-yPT8mA68PNQ';
+            redirectDomain = 'http://reddittv.wattydev.com';
+          }
+          window.location.replace('https://www.reddit.com/api/v1/authorize?client_id=' + clientId + '&response_type=token&state=' + state + '&redirect_uri=' + redirectDomain + '/authenticate&scope=identity,edit,history,mysubreddits,read,save,submit,vote');
           return false;
         }
       }
@@ -1606,16 +1605,6 @@ define('reddit/tests/components/reddit-post.jshint', function () {
   });
 
 });
-define('reddit/tests/controllers/authenticate.jshint', function () {
-
-  'use strict';
-
-  QUnit.module('JSHint - controllers');
-  QUnit.test('controllers/authenticate.js should pass jshint', function(assert) { 
-    assert.ok(true, 'controllers/authenticate.js should pass jshint.'); 
-  });
-
-});
 define('reddit/tests/controllers/index.jshint', function () {
 
   'use strict';
@@ -2597,7 +2586,7 @@ catch(err) {
 if (runningTests) {
   require("reddit/tests/test-helper");
 } else {
-  require("reddit/app")["default"].create({"name":"reddit","version":"0.0.0+8b6ce541"});
+  require("reddit/app")["default"].create({"name":"reddit","version":"0.0.0+32ea97e1"});
 }
 
 /* jshint ignore:end */
