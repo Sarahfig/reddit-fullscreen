@@ -3,7 +3,7 @@ import Ember from 'ember';
 export default Ember.Service.extend({
 	listings: function(list) {
 		var self = this;
-		return list.map(function(item) {
+		var mapped = list.map(function(item) {
 			var data = item.data,
 			parsed = {
 				author: data.author,
@@ -73,11 +73,22 @@ export default Ember.Service.extend({
 			}
 			return parsed;
 		});
+
+		// return mapped.filter(function(item) {
+		// 	if(item.isAlbum) {
+		// 		return true;
+		// 	} else {
+		// 		return false;
+		// 	}
+		// });
+
+		return mapped;
 	},
 	album: function(parsed) {
 		var id = parsed.url.split('a/')[1];
 		this.api.post.getImgurAlbum(id).then(function(response) {
 			parsed.album = response.data.images;
+			console.log('album', parsed);
 		});
 	}
 });

@@ -36,6 +36,56 @@ define('reddit/components/app-version', ['exports', 'ember-cli-app-version/compo
   });
 
 });
+define('reddit/components/imgur-album', ['exports', 'ember'], function (exports, Ember) {
+
+	'use strict';
+
+	exports['default'] = Ember['default'].Component.extend({
+		currentIndex: 0,
+		currentNumber: (function () {
+			return this.get('currentIndex') + 1;
+		}).property('currentIndex'),
+		currentImage: (function () {
+			var album = this.get('album');
+			return album[this.get('currentIndex')];
+		}).property('currentIndex', 'album'),
+		totalImages: (function () {
+			return this.get('album').length;
+		}).property('album'),
+		init: function init() {
+			Ember['default'].$(window).bind('keypress', Ember['default'].run.bind(this, this.globalKeyPress));
+			this._super.apply(this);
+		},
+		globalKeyPress: function globalKeyPress(e) {
+			if (!this.get('album')) {
+				return;
+			}
+			var key = this.bindings.keyMap[e.keyCode];
+			var functions = this.bindings.functions;
+			var currentIndex = this.get('currentIndex');
+			var totalImages = this.get('totalImages');
+			if (key === functions.nextImage.getKey()) {
+				var next;
+				if (currentIndex === totalImages - 1) {
+					next = 0;
+				} else {
+					next = currentIndex + 1;
+				}
+				this.set('currentIndex', next);
+			}
+			if (key === functions.previousImage.getKey()) {
+				var previous;
+				if (currentIndex === 0) {
+					previous = totalImages - 1;
+				} else {
+					previous = currentIndex - 1;
+				}
+				this.set('currentIndex', previous);
+			}
+		}
+	});
+
+});
 define('reddit/components/reddit-list', ['exports', 'ember'], function (exports, Ember) {
 
 	'use strict';
@@ -105,12 +155,10 @@ define('reddit/components/reddit-post', ['exports', 'ember'], function (exports,
 		}).property('post.isDownVoted'),
 		init: function init() {
 			if (this.attrs.post.value.isCurrent) {
-				this.bindKeyPress = Ember['default'].run.bind(this, this.globalKeyPress);
-				Ember['default'].$(window).bind('keypress', this.bindKeyPress);
+				Ember['default'].$(window).bind('keypress', Ember['default'].run.bind(this, this.globalKeyPress));
 			}
 			this._super.apply(this);
 		},
-		bindKeyPress: null,
 		globalKeyPress: function globalKeyPress(e) {
 			if (!this.get('post')) {
 				return;
@@ -686,6 +734,16 @@ define('reddit/services/keybindings', ['exports', 'ember'], function (exports, E
 				'default': 'S',
 				description: 'Downvote currently viewed post',
 				name: 'keyDownVote'
+			}),
+			nextImage: new KeyFunction({
+				'default': 'E',
+				description: 'Move to next image in album',
+				name: 'keyNextImage'
+			}),
+			previousImage: new KeyFunction({
+				'default': 'Q',
+				description: 'Move to previous image in album',
+				name: 'keyPreviousImage'
 			})
 		},
 		keyMap: {
@@ -751,7 +809,7 @@ define('reddit/services/parser', ['exports', 'ember'], function (exports, Ember)
 	exports['default'] = Ember['default'].Service.extend({
 		listings: function listings(list) {
 			var self = this;
-			return list.map(function (item) {
+			var mapped = list.map(function (item) {
 				var data = item.data,
 				    parsed = {
 					author: data.author,
@@ -821,11 +879,22 @@ define('reddit/services/parser', ['exports', 'ember'], function (exports, Ember)
 				}
 				return parsed;
 			});
+
+			// return mapped.filter(function(item) {
+			// 	if(item.isAlbum) {
+			// 		return true;
+			// 	} else {
+			// 		return false;
+			// 	}
+			// });
+
+			return mapped;
 		},
 		album: function album(parsed) {
 			var id = parsed.url.split('a/')[1];
 			this.api.post.getImgurAlbum(id).then(function (response) {
 				parsed.album = response.data.images;
+				console.log('album', parsed);
 			});
 		}
 	});
@@ -977,6 +1046,72 @@ define('reddit/templates/authenticate', ['exports'], function (exports) {
       },
       statements: [
         ["content","outlet",["loc",[null,[1,0],[1,10]]]]
+      ],
+      locals: [],
+      templates: []
+    };
+  }()));
+
+});
+define('reddit/templates/components/imgur-album', ['exports'], function (exports) {
+
+  'use strict';
+
+  exports['default'] = Ember.HTMLBars.template((function() {
+    return {
+      meta: {
+        "revision": "Ember@1.13.7",
+        "loc": {
+          "source": null,
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 3,
+            "column": 0
+          }
+        },
+        "moduleName": "reddit/templates/components/imgur-album.hbs"
+      },
+      arity: 0,
+      cachedFragment: null,
+      hasRendered: false,
+      buildFragment: function buildFragment(dom) {
+        var el0 = dom.createDocumentFragment();
+        var el1 = dom.createElement("div");
+        dom.setAttribute(el1,"class","album-image");
+        dom.appendChild(el0, el1);
+        var el1 = dom.createTextNode("\n");
+        dom.appendChild(el0, el1);
+        var el1 = dom.createElement("div");
+        dom.setAttribute(el1,"class","album-nav");
+        var el2 = dom.createTextNode("Viewing ");
+        dom.appendChild(el1, el2);
+        var el2 = dom.createComment("");
+        dom.appendChild(el1, el2);
+        var el2 = dom.createTextNode(" of ");
+        dom.appendChild(el1, el2);
+        var el2 = dom.createComment("");
+        dom.appendChild(el1, el2);
+        dom.appendChild(el0, el1);
+        var el1 = dom.createTextNode("\n");
+        dom.appendChild(el0, el1);
+        return el0;
+      },
+      buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+        var element0 = dom.childAt(fragment, [0]);
+        var element1 = dom.childAt(fragment, [2]);
+        var morphs = new Array(3);
+        morphs[0] = dom.createAttrMorph(element0, 'style');
+        morphs[1] = dom.createMorphAt(element1,1,1);
+        morphs[2] = dom.createMorphAt(element1,3,3);
+        return morphs;
+      },
+      statements: [
+        ["attribute","style",["concat",["background-image: url(",["get","currentImage.link",["loc",[null,[1,56],[1,73]]]],")"]]],
+        ["content","currentNumber",["loc",[null,[2,31],[2,48]]]],
+        ["content","totalImages",["loc",[null,[2,52],[2,67]]]]
       ],
       locals: [],
       templates: []
@@ -1329,7 +1464,7 @@ define('reddit/templates/components/reddit-post', ['exports'], function (exports
                 "column": 2
               },
               "end": {
-                "line": 19,
+                "line": 17,
                 "column": 2
               }
             },
@@ -1342,18 +1477,19 @@ define('reddit/templates/components/reddit-post', ['exports'], function (exports
             var el0 = dom.createDocumentFragment();
             var el1 = dom.createTextNode("			");
             dom.appendChild(el0, el1);
-            var el1 = dom.createElement("div");
-            dom.setAttribute(el1,"class","album");
-            var el2 = dom.createTextNode("\n\n			");
-            dom.appendChild(el1, el2);
+            var el1 = dom.createComment("");
             dom.appendChild(el0, el1);
             var el1 = dom.createTextNode("\n");
             dom.appendChild(el0, el1);
             return el0;
           },
-          buildRenderNodes: function buildRenderNodes() { return []; },
+          buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+            var morphs = new Array(1);
+            morphs[0] = dom.createMorphAt(fragment,1,1,contextualElement);
+            return morphs;
+          },
           statements: [
-
+            ["inline","imgur-album",[],["elementId","album","album",["subexpr","@mut",[["get","post.album",["loc",[null,[16,41],[16,51]]]]],[],[]]],["loc",[null,[16,3],[16,53]]]]
           ],
           locals: [],
           templates: []
@@ -1369,7 +1505,7 @@ define('reddit/templates/components/reddit-post', ['exports'], function (exports
               "column": 1
             },
             "end": {
-              "line": 20,
+              "line": 18,
               "column": 1
             }
           },
@@ -1408,7 +1544,7 @@ define('reddit/templates/components/reddit-post', ['exports'], function (exports
           ["block","if",[["get","post.isVideo",["loc",[null,[6,8],[6,20]]]]],[],1,null,["loc",[null,[6,2],[8,9]]]],
           ["block","if",[["get","post.isArticleThumbnail",["loc",[null,[9,8],[9,31]]]]],[],2,null,["loc",[null,[9,2],[11,9]]]],
           ["block","if",[["get","post.isArticleNoThumbnail",["loc",[null,[12,8],[12,33]]]]],[],3,null,["loc",[null,[12,2],[14,9]]]],
-          ["block","if",[["get","post.isAlbum",["loc",[null,[15,8],[15,20]]]]],[],4,null,["loc",[null,[15,2],[19,9]]]]
+          ["block","if",[["get","post.isAlbum",["loc",[null,[15,8],[15,20]]]]],[],4,null,["loc",[null,[15,2],[17,9]]]]
         ],
         locals: [],
         templates: [child0, child1, child2, child3, child4]
@@ -1422,11 +1558,11 @@ define('reddit/templates/components/reddit-post', ['exports'], function (exports
             "loc": {
               "source": null,
               "start": {
-                "line": 21,
+                "line": 19,
                 "column": 2
               },
               "end": {
-                "line": 23,
+                "line": 21,
                 "column": 2
               }
             },
@@ -1453,7 +1589,7 @@ define('reddit/templates/components/reddit-post', ['exports'], function (exports
             return morphs;
           },
           statements: [
-            ["attribute","style",["concat",["background-image:url(",["get","post.thumbnail",["loc",[null,[22,52],[22,66]]]],")"]]]
+            ["attribute","style",["concat",["background-image:url(",["get","post.thumbnail",["loc",[null,[20,52],[20,66]]]],")"]]]
           ],
           locals: [],
           templates: []
@@ -1466,11 +1602,11 @@ define('reddit/templates/components/reddit-post', ['exports'], function (exports
             "loc": {
               "source": null,
               "start": {
-                "line": 23,
+                "line": 21,
                 "column": 2
               },
               "end": {
-                "line": 25,
+                "line": 23,
                 "column": 2
               }
             },
@@ -1504,11 +1640,11 @@ define('reddit/templates/components/reddit-post', ['exports'], function (exports
           "loc": {
             "source": null,
             "start": {
-              "line": 20,
+              "line": 18,
               "column": 1
             },
             "end": {
-              "line": 26,
+              "line": 24,
               "column": 1
             }
           },
@@ -1531,7 +1667,7 @@ define('reddit/templates/components/reddit-post', ['exports'], function (exports
           return morphs;
         },
         statements: [
-          ["block","if",[["get","post.hasThumbnail",["loc",[null,[21,8],[21,25]]]]],[],0,1,["loc",[null,[21,2],[25,9]]]]
+          ["block","if",[["get","post.hasThumbnail",["loc",[null,[19,8],[19,25]]]]],[],0,1,["loc",[null,[19,2],[23,9]]]]
         ],
         locals: [],
         templates: [child0, child1]
@@ -1547,7 +1683,7 @@ define('reddit/templates/components/reddit-post', ['exports'], function (exports
             "column": 0
           },
           "end": {
-            "line": 31,
+            "line": 29,
             "column": 0
           }
         },
@@ -1593,9 +1729,9 @@ define('reddit/templates/components/reddit-post', ['exports'], function (exports
         return morphs;
       },
       statements: [
-        ["block","if",[["get","post.isCurrent",["loc",[null,[2,7],[2,21]]]]],[],0,1,["loc",[null,[2,1],[26,8]]]],
-        ["attribute","href",["concat",[["get","post.url",["loc",[null,[29,12],[29,20]]]]]]],
-        ["content","post.title",["loc",[null,[29,54],[29,68]]]]
+        ["block","if",[["get","post.isCurrent",["loc",[null,[2,7],[2,21]]]]],[],0,1,["loc",[null,[2,1],[24,8]]]],
+        ["attribute","href",["concat",[["get","post.url",["loc",[null,[27,12],[27,20]]]]]]],
+        ["content","post.title",["loc",[null,[27,54],[27,68]]]]
       ],
       locals: [],
       templates: [child0, child1]
@@ -1719,6 +1855,16 @@ define('reddit/tests/app.jshint', function () {
   });
 
 });
+define('reddit/tests/components/imgur-album.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - components');
+  QUnit.test('components/imgur-album.js should pass jshint', function(assert) { 
+    assert.ok(true, 'components/imgur-album.js should pass jshint.'); 
+  });
+
+});
 define('reddit/tests/components/reddit-list.jshint', function () {
 
   'use strict';
@@ -1833,6 +1979,149 @@ define('reddit/tests/initializers/services.jshint', function () {
   QUnit.module('JSHint - initializers');
   QUnit.test('initializers/services.js should pass jshint', function(assert) { 
     assert.ok(true, 'initializers/services.js should pass jshint.'); 
+  });
+
+});
+define('reddit/tests/integration/components/imbur-album-test', ['ember-qunit'], function (ember_qunit) {
+
+  'use strict';
+
+  ember_qunit.moduleForComponent('imbur-album', 'Integration | Component | imbur album', {
+    integration: true
+  });
+
+  ember_qunit.test('it renders', function (assert) {
+    assert.expect(2);
+
+    // Set any properties with this.set('myProperty', 'value');
+    // Handle any actions with this.on('myAction', function(val) { ... });
+
+    this.render(Ember.HTMLBars.template((function () {
+      return {
+        meta: {
+          'revision': 'Ember@1.13.7',
+          'loc': {
+            'source': null,
+            'start': {
+              'line': 1,
+              'column': 0
+            },
+            'end': {
+              'line': 1,
+              'column': 15
+            }
+          }
+        },
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createComment('');
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var morphs = new Array(1);
+          morphs[0] = dom.createMorphAt(fragment, 0, 0, contextualElement);
+          dom.insertBoundary(fragment, 0);
+          dom.insertBoundary(fragment, null);
+          return morphs;
+        },
+        statements: [['content', 'imbur-album', ['loc', [null, [1, 0], [1, 15]]]]],
+        locals: [],
+        templates: []
+      };
+    })()));
+
+    assert.equal(this.$().text().trim(), '');
+
+    // Template block usage:
+    this.render(Ember.HTMLBars.template((function () {
+      var child0 = (function () {
+        return {
+          meta: {
+            'revision': 'Ember@1.13.7',
+            'loc': {
+              'source': null,
+              'start': {
+                'line': 2,
+                'column': 4
+              },
+              'end': {
+                'line': 4,
+                'column': 4
+              }
+            }
+          },
+          arity: 0,
+          cachedFragment: null,
+          hasRendered: false,
+          buildFragment: function buildFragment(dom) {
+            var el0 = dom.createDocumentFragment();
+            var el1 = dom.createTextNode('      template block text\n');
+            dom.appendChild(el0, el1);
+            return el0;
+          },
+          buildRenderNodes: function buildRenderNodes() {
+            return [];
+          },
+          statements: [],
+          locals: [],
+          templates: []
+        };
+      })();
+
+      return {
+        meta: {
+          'revision': 'Ember@1.13.7',
+          'loc': {
+            'source': null,
+            'start': {
+              'line': 1,
+              'column': 0
+            },
+            'end': {
+              'line': 5,
+              'column': 2
+            }
+          }
+        },
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createTextNode('\n');
+          dom.appendChild(el0, el1);
+          var el1 = dom.createComment('');
+          dom.appendChild(el0, el1);
+          var el1 = dom.createTextNode('  ');
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var morphs = new Array(1);
+          morphs[0] = dom.createMorphAt(fragment, 1, 1, contextualElement);
+          return morphs;
+        },
+        statements: [['block', 'imbur-album', [], [], 0, null, ['loc', [null, [2, 4], [4, 20]]]]],
+        locals: [],
+        templates: [child0]
+      };
+    })()));
+
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
+
+});
+define('reddit/tests/integration/components/imbur-album-test.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - integration/components');
+  QUnit.test('integration/components/imbur-album-test.js should pass jshint', function(assert) { 
+    assert.ok(true, 'integration/components/imbur-album-test.js should pass jshint.'); 
   });
 
 });
