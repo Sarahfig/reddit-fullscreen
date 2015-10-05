@@ -9,6 +9,7 @@ Router.map(function() {
   this.route('index', {path: '/'});
   this.route('authenticate');
   this.route('top');
+  this.route('settings');
 });
 
 export default Router;

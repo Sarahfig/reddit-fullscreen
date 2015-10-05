@@ -1,0 +1,15 @@
+{{reddit-nav tagName="nav" current=""}}
+<div class="settings-wrapper">
+	<ul>
+		{{#each binding in keymap}}
+			<li class="setting-item">
+				<div class="description">
+					{{binding.description}}
+				</div>
+				<div class="value">
+					{{view "select" content=keyOptions value=binding.value}}
+				</div>
+			</li>
+		{{/each}}
+	</ul>
+</div>

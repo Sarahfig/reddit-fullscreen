@@ -17,7 +17,7 @@ module.exports = function(environment) {
       'connect-src': "'self' https://*.reddit.com https://*.imgur.com",
       'img-src': "'self'" + imageSrcString,
 	  'frame-src': "'self' http://cdn.embedly.com",
-	  'style-src': "'self' 'unsafe-inline'"
+	  'style-src': "'self' 'unsafe-inline'",
     },
     modulePrefix: 'reddit',
     environment: environment,

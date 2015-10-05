@@ -1,3 +1,5 @@
+@import "fontawesome/font-awesome.less";
+
 @white: #fff;
 @grayLighter: #f1f1f1;
 @gray: #cdcdcd;
@@ -25,6 +27,13 @@ body {
 	color: @grayLighter;
 	overflow:hidden;
 	font-size: 2.5vh;
+}
+.go-settings {
+	position:absolute;
+	padding: 1%;
+	top:1%;
+	right: 1%;
+	display:block;
 }
 #list {
 	height: 100vh;
@@ -139,4 +148,16 @@ nav ul{
 .album-nav {
 	position:relative;
 	background: rgba(0,0,0,.5);
+}
+.setting-item {
+	display:block;
+	padding: 1% 2%;
+	border-bottom: 1px solid @grayDarker;
+
+	>div {
+		display:inline-block;
+	}
+	>.description {
+		width: 75%;
+	}
 }

@@ -286,6 +286,43 @@ define('reddit/controllers/object', ['exports', 'ember'], function (exports, Emb
 	exports['default'] = Ember['default'].Controller;
 
 });
+define('reddit/controllers/settings', ['exports', 'ember'], function (exports, Ember) {
+
+	'use strict';
+
+	exports['default'] = Ember['default'].Controller.extend({
+		init: function init() {
+			//console.log(this);
+		},
+		keymap: (function () {
+			var bindings = this.bindings.functions;
+			var _bindings = [];
+			Ember['default'].$.each(bindings, function (index, item) {
+				item.name = index;
+				if (item.user() === 'default' || !item.user()) {
+					item.value = item['default'];
+				} else {
+					item.value = item.user();
+				}
+				item.update = (function () {
+					console.log('update');
+				}).property('value');
+				_bindings.push(item);
+			});
+			console.log('setkeymap', _bindings);
+			return _bindings;
+		}).property('bindings.functions'),
+		keyOptions: (function () {
+			var options = this.bindings.keyMap;
+			var _options = [];
+			Ember['default'].$.each(options, function (index, item) {
+				_options.push(item);
+			});
+			return _options;
+		}).property('bindings.keyMap')
+	});
+
+});
 define('reddit/controllers/top', ['exports', 'ember'], function (exports, Ember) {
 
   'use strict';
@@ -437,12 +474,14 @@ define('reddit/initializers/services', ['exports'], function (exports) {
     application.inject('route', 'session', 'service:session');
     application.inject('route', 'api', 'service:api');
     application.inject('route', 'parse', 'service:parser');
+    application.inject('route', 'bindings', 'service:keybindings');
 
     //inject into components
     application.inject('component', 'bindings', 'service:keybindings');
 
     //inject into controllers
     application.inject('controller', 'api', 'service:api');
+    application.inject('controller', 'bindings', 'service:keybindings');
 
     //inject into services
     application.inject('service:api', 'session', 'service:session');
@@ -467,6 +506,7 @@ define('reddit/router', ['exports', 'ember', 'reddit/config/environment'], funct
     this.route('index', { path: '/' });
     this.route('authenticate');
     this.route('top');
+    this.route('settings');
   });
 
   exports['default'] = Router;
@@ -573,6 +613,25 @@ define('reddit/routes/index', ['exports', 'ember'], function (exports, Ember) {
 					self.set('currentModel.list', combined);
 				});
 			}
+		}
+	});
+
+});
+define('reddit/routes/settings', ['exports', 'ember'], function (exports, Ember) {
+
+	'use strict';
+
+	exports['default'] = Ember['default'].Route.extend({
+		beforeModel: function beforeModel() {
+			if (this.session.auth.needed()) {
+				localStorage.originalRoute = 'settings';
+				this.transitionTo('authenticate');
+			}
+		},
+		model: function model() {
+			var model = { foo: 'bar' };
+
+			return model;
 		}
 	});
 
@@ -981,7 +1040,16 @@ define('reddit/templates/application', ['exports'], function (exports) {
         var el2 = dom.createTextNode("\n");
         dom.appendChild(el1, el2);
         dom.appendChild(el0, el1);
-        var el1 = dom.createTextNode("\n\n");
+        var el1 = dom.createTextNode("\n");
+        dom.appendChild(el0, el1);
+        var el1 = dom.createElement("a");
+        dom.setAttribute(el1,"class","go-settings");
+        dom.setAttribute(el1,"href","/settings");
+        var el2 = dom.createElement("i");
+        dom.setAttribute(el2,"class","fa fa-cog");
+        dom.appendChild(el1, el2);
+        dom.appendChild(el0, el1);
+        var el1 = dom.createTextNode("\n");
         dom.appendChild(el0, el1);
         var el1 = dom.createComment("");
         dom.appendChild(el0, el1);
@@ -992,7 +1060,7 @@ define('reddit/templates/application', ['exports'], function (exports) {
       buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
         var morphs = new Array(2);
         morphs[0] = dom.createMorphAt(dom.childAt(fragment, [0]),1,1);
-        morphs[1] = dom.createMorphAt(fragment,2,2,contextualElement);
+        morphs[1] = dom.createMorphAt(fragment,4,4,contextualElement);
         return morphs;
       },
       statements: [
@@ -1791,6 +1859,142 @@ define('reddit/templates/index', ['exports'], function (exports) {
   }()));
 
 });
+define('reddit/templates/settings', ['exports'], function (exports) {
+
+  'use strict';
+
+  exports['default'] = Ember.HTMLBars.template((function() {
+    var child0 = (function() {
+      return {
+        meta: {
+          "revision": "Ember@1.13.7",
+          "loc": {
+            "source": null,
+            "start": {
+              "line": 4,
+              "column": 2
+            },
+            "end": {
+              "line": 13,
+              "column": 2
+            }
+          },
+          "moduleName": "reddit/templates/settings.hbs"
+        },
+        arity: 1,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createTextNode("			");
+          dom.appendChild(el0, el1);
+          var el1 = dom.createElement("li");
+          dom.setAttribute(el1,"class","setting-item");
+          var el2 = dom.createTextNode("\n				");
+          dom.appendChild(el1, el2);
+          var el2 = dom.createElement("div");
+          dom.setAttribute(el2,"class","description");
+          var el3 = dom.createTextNode("\n					");
+          dom.appendChild(el2, el3);
+          var el3 = dom.createComment("");
+          dom.appendChild(el2, el3);
+          var el3 = dom.createTextNode("\n				");
+          dom.appendChild(el2, el3);
+          dom.appendChild(el1, el2);
+          var el2 = dom.createTextNode("\n				");
+          dom.appendChild(el1, el2);
+          var el2 = dom.createElement("div");
+          dom.setAttribute(el2,"class","value");
+          var el3 = dom.createTextNode("\n					");
+          dom.appendChild(el2, el3);
+          var el3 = dom.createComment("");
+          dom.appendChild(el2, el3);
+          var el3 = dom.createTextNode("\n				");
+          dom.appendChild(el2, el3);
+          dom.appendChild(el1, el2);
+          var el2 = dom.createTextNode("\n			");
+          dom.appendChild(el1, el2);
+          dom.appendChild(el0, el1);
+          var el1 = dom.createTextNode("\n");
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var element0 = dom.childAt(fragment, [1]);
+          var morphs = new Array(2);
+          morphs[0] = dom.createMorphAt(dom.childAt(element0, [1]),1,1);
+          morphs[1] = dom.createMorphAt(dom.childAt(element0, [3]),1,1);
+          return morphs;
+        },
+        statements: [
+          ["content","binding.description",["loc",[null,[7,5],[7,28]]]],
+          ["inline","view",["select"],["content",["subexpr","@mut",[["get","keyOptions",["loc",[null,[10,29],[10,39]]]]],[],[]],"value",["subexpr","@mut",[["get","binding.value",["loc",[null,[10,46],[10,59]]]]],[],[]]],["loc",[null,[10,5],[10,61]]]]
+        ],
+        locals: ["binding"],
+        templates: []
+      };
+    }());
+    return {
+      meta: {
+        "revision": "Ember@1.13.7",
+        "loc": {
+          "source": null,
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 16,
+            "column": 0
+          }
+        },
+        "moduleName": "reddit/templates/settings.hbs"
+      },
+      arity: 0,
+      cachedFragment: null,
+      hasRendered: false,
+      buildFragment: function buildFragment(dom) {
+        var el0 = dom.createDocumentFragment();
+        var el1 = dom.createComment("");
+        dom.appendChild(el0, el1);
+        var el1 = dom.createTextNode("\n");
+        dom.appendChild(el0, el1);
+        var el1 = dom.createElement("div");
+        dom.setAttribute(el1,"class","settings-wrapper");
+        var el2 = dom.createTextNode("\n	");
+        dom.appendChild(el1, el2);
+        var el2 = dom.createElement("ul");
+        var el3 = dom.createTextNode("\n");
+        dom.appendChild(el2, el3);
+        var el3 = dom.createComment("");
+        dom.appendChild(el2, el3);
+        var el3 = dom.createTextNode("	");
+        dom.appendChild(el2, el3);
+        dom.appendChild(el1, el2);
+        var el2 = dom.createTextNode("\n");
+        dom.appendChild(el1, el2);
+        dom.appendChild(el0, el1);
+        var el1 = dom.createTextNode("\n");
+        dom.appendChild(el0, el1);
+        return el0;
+      },
+      buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+        var morphs = new Array(2);
+        morphs[0] = dom.createMorphAt(fragment,0,0,contextualElement);
+        morphs[1] = dom.createMorphAt(dom.childAt(fragment, [2, 1]),1,1);
+        dom.insertBoundary(fragment, 0);
+        return morphs;
+      },
+      statements: [
+        ["inline","reddit-nav",[],["tagName","nav","current",""],["loc",[null,[1,0],[1,39]]]],
+        ["block","each",[["get","keymap",["loc",[null,[4,21],[4,27]]]]],[],0,null,["loc",[null,[4,2],[13,11]]]]
+      ],
+      locals: [],
+      templates: [child0]
+    };
+  }()));
+
+});
 define('reddit/templates/top', ['exports'], function (exports) {
 
   'use strict';
@@ -1901,6 +2105,16 @@ define('reddit/tests/controllers/index.jshint', function () {
   QUnit.module('JSHint - controllers');
   QUnit.test('controllers/index.js should pass jshint', function(assert) { 
     assert.ok(true, 'controllers/index.js should pass jshint.'); 
+  });
+
+});
+define('reddit/tests/controllers/settings.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - controllers');
+  QUnit.test('controllers/settings.js should pass jshint', function(assert) { 
+    assert.ok(true, 'controllers/settings.js should pass jshint.'); 
   });
 
 });
@@ -2553,6 +2767,149 @@ define('reddit/tests/integration/components/reddit-post-test.jshint', function (
   });
 
 });
+define('reddit/tests/integration/components/ui-select-test', ['ember-qunit'], function (ember_qunit) {
+
+  'use strict';
+
+  ember_qunit.moduleForComponent('ui-select', 'Integration | Component | ui select', {
+    integration: true
+  });
+
+  ember_qunit.test('it renders', function (assert) {
+    assert.expect(2);
+
+    // Set any properties with this.set('myProperty', 'value');
+    // Handle any actions with this.on('myAction', function(val) { ... });
+
+    this.render(Ember.HTMLBars.template((function () {
+      return {
+        meta: {
+          'revision': 'Ember@1.13.7',
+          'loc': {
+            'source': null,
+            'start': {
+              'line': 1,
+              'column': 0
+            },
+            'end': {
+              'line': 1,
+              'column': 13
+            }
+          }
+        },
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createComment('');
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var morphs = new Array(1);
+          morphs[0] = dom.createMorphAt(fragment, 0, 0, contextualElement);
+          dom.insertBoundary(fragment, 0);
+          dom.insertBoundary(fragment, null);
+          return morphs;
+        },
+        statements: [['content', 'ui-select', ['loc', [null, [1, 0], [1, 13]]]]],
+        locals: [],
+        templates: []
+      };
+    })()));
+
+    assert.equal(this.$().text().trim(), '');
+
+    // Template block usage:
+    this.render(Ember.HTMLBars.template((function () {
+      var child0 = (function () {
+        return {
+          meta: {
+            'revision': 'Ember@1.13.7',
+            'loc': {
+              'source': null,
+              'start': {
+                'line': 2,
+                'column': 4
+              },
+              'end': {
+                'line': 4,
+                'column': 4
+              }
+            }
+          },
+          arity: 0,
+          cachedFragment: null,
+          hasRendered: false,
+          buildFragment: function buildFragment(dom) {
+            var el0 = dom.createDocumentFragment();
+            var el1 = dom.createTextNode('      template block text\n');
+            dom.appendChild(el0, el1);
+            return el0;
+          },
+          buildRenderNodes: function buildRenderNodes() {
+            return [];
+          },
+          statements: [],
+          locals: [],
+          templates: []
+        };
+      })();
+
+      return {
+        meta: {
+          'revision': 'Ember@1.13.7',
+          'loc': {
+            'source': null,
+            'start': {
+              'line': 1,
+              'column': 0
+            },
+            'end': {
+              'line': 5,
+              'column': 2
+            }
+          }
+        },
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createTextNode('\n');
+          dom.appendChild(el0, el1);
+          var el1 = dom.createComment('');
+          dom.appendChild(el0, el1);
+          var el1 = dom.createTextNode('  ');
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var morphs = new Array(1);
+          morphs[0] = dom.createMorphAt(fragment, 1, 1, contextualElement);
+          return morphs;
+        },
+        statements: [['block', 'ui-select', [], [], 0, null, ['loc', [null, [2, 4], [4, 18]]]]],
+        locals: [],
+        templates: [child0]
+      };
+    })()));
+
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
+
+});
+define('reddit/tests/integration/components/ui-select-test.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - integration/components');
+  QUnit.test('integration/components/ui-select-test.js should pass jshint', function(assert) { 
+    assert.ok(true, 'integration/components/ui-select-test.js should pass jshint.'); 
+  });
+
+});
 define('reddit/tests/router.jshint', function () {
 
   'use strict';
@@ -2590,6 +2947,16 @@ define('reddit/tests/routes/index.jshint', function () {
   QUnit.module('JSHint - routes');
   QUnit.test('routes/index.js should pass jshint', function(assert) { 
     assert.ok(true, 'routes/index.js should pass jshint.'); 
+  });
+
+});
+define('reddit/tests/routes/settings.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - routes');
+  QUnit.test('routes/settings.js should pass jshint', function(assert) { 
+    assert.ok(true, 'routes/settings.js should pass jshint.'); 
   });
 
 });
@@ -2735,6 +3102,32 @@ define('reddit/tests/unit/controllers/index-test.jshint', function () {
   QUnit.module('JSHint - unit/controllers');
   QUnit.test('unit/controllers/index-test.js should pass jshint', function(assert) { 
     assert.ok(true, 'unit/controllers/index-test.js should pass jshint.'); 
+  });
+
+});
+define('reddit/tests/unit/controllers/settings-test', ['ember-qunit'], function (ember_qunit) {
+
+  'use strict';
+
+  ember_qunit.moduleFor('controller:settings', {
+    // Specify the other units that are required for this test.
+    // needs: ['controller:foo']
+  });
+
+  // Replace this with your real tests.
+  ember_qunit.test('it exists', function (assert) {
+    var controller = this.subject();
+    assert.ok(controller);
+  });
+
+});
+define('reddit/tests/unit/controllers/settings-test.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - unit/controllers');
+  QUnit.test('unit/controllers/settings-test.js should pass jshint', function(assert) { 
+    assert.ok(true, 'unit/controllers/settings-test.js should pass jshint.'); 
   });
 
 });
@@ -2897,6 +3290,31 @@ define('reddit/tests/unit/routes/index-test.jshint', function () {
   QUnit.module('JSHint - unit/routes');
   QUnit.test('unit/routes/index-test.js should pass jshint', function(assert) { 
     assert.ok(true, 'unit/routes/index-test.js should pass jshint.'); 
+  });
+
+});
+define('reddit/tests/unit/routes/settings-test', ['ember-qunit'], function (ember_qunit) {
+
+  'use strict';
+
+  ember_qunit.moduleFor('route:settings', 'Unit | Route | settings', {
+    // Specify the other units that are required for this test.
+    // needs: ['controller:foo']
+  });
+
+  ember_qunit.test('it exists', function (assert) {
+    var route = this.subject();
+    assert.ok(route);
+  });
+
+});
+define('reddit/tests/unit/routes/settings-test.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - unit/routes');
+  QUnit.test('unit/routes/settings-test.js should pass jshint', function(assert) { 
+    assert.ok(true, 'unit/routes/settings-test.js should pass jshint.'); 
   });
 
 });
@@ -3161,7 +3579,7 @@ catch(err) {
 if (runningTests) {
   require("reddit/tests/test-helper");
 } else {
-  require("reddit/app")["default"].create({"name":"reddit","version":"0.0.0+e04c72ad"});
+  require("reddit/app")["default"].create({"name":"reddit","version":"0.0.0+7aaddd55"});
 }
 
 /* jshint ignore:end */
