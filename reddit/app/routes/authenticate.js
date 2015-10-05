@@ -11,7 +11,9 @@ export default Ember.Route.extend({
     }
     self.api.account.getMe().then(function(response) {
       self.session.set('accountUser', response);
-      self.transitionTo('index');
+	  var page = localStorage.originalRoute || 'index';
+	  localStorage.originalRoute = '';
+      self.transitionTo(page);
     });
   },
 

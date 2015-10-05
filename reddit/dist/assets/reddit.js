@@ -500,7 +500,9 @@ define('reddit/routes/authenticate', ['exports', 'ember'], function (exports, Em
       }
       self.api.account.getMe().then(function (response) {
         self.session.set('accountUser', response);
-        self.transitionTo('index');
+        var page = localStorage.originalRoute || 'index';
+        localStorage.originalRoute = '';
+        self.transitionTo(page);
       });
     },
 
@@ -582,6 +584,7 @@ define('reddit/routes/top', ['exports', 'ember'], function (exports, Ember) {
 	exports['default'] = Ember['default'].Route.extend({
 		beforeModel: function beforeModel() {
 			if (this.session.auth.needed()) {
+				localStorage.originalRoute = 'top';
 				this.transitionTo('authenticate');
 			}
 		},
@@ -3158,7 +3161,7 @@ catch(err) {
 if (runningTests) {
   require("reddit/tests/test-helper");
 } else {
-  require("reddit/app")["default"].create({"name":"reddit","version":"0.0.0+99522fce"});
+  require("reddit/app")["default"].create({"name":"reddit","version":"0.0.0+e04c72ad"});
 }
 
 /* jshint ignore:end */
